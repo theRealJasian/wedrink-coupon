@@ -108,8 +108,13 @@ export default function StaffDashboardPage() {
       await loadDashboardCounts(cancelled);
     })();
 
+    const interval = window.setInterval(() => {
+      void loadDashboardCounts(cancelled);
+    }, 2500);
+
     return () => {
       cancelled = true;
+      window.clearInterval(interval);
     };
   }, []);
 
@@ -322,48 +327,6 @@ export default function StaffDashboardPage() {
                 <span>{remaining === null ? '—' : remaining}</span>
                 <span>คูปอง 🎟️</span>
               </div>
-              <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-2xl border border-cyan-100 bg-white/80 px-4 py-3 shadow-sm">
-                  <p className="text-xs uppercase tracking-wide text-cyan-700">
-                    สร้างแล้ว
-                  </p>
-                  <p className="mt-1 text-2xl font-semibold">
-                    {dashboardCounts.given === null ? '—' : dashboardCounts.given}
-                  </p>
-                  <p className="mt-1 text-xs text-cyan-900/60">
-                    คูปองทั้งหมดที่ถูกสร้างในระบบ
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-cyan-100 bg-white/80 px-4 py-3 shadow-sm">
-                  <p className="text-xs uppercase tracking-wide text-cyan-700">
-                    ลูกค้ารับแล้ว
-                  </p>
-                  <p className="mt-1 text-2xl font-semibold">
-                    {dashboardCounts.claimed === null
-                      ? '—'
-                      : dashboardCounts.claimed}
-                  </p>
-                  <p className="mt-1 text-xs text-cyan-900/60">
-                    ลูกค้าสแกน QR และกรอกเบอร์โทรแล้ว
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-cyan-100 bg-white/80 px-4 py-3 shadow-sm sm:col-span-2">
-                  <p className="text-xs uppercase tracking-wide text-cyan-700">
-                    ใช้แล้ว
-                  </p>
-                  <p className="mt-1 text-2xl font-semibold">
-                    {dashboardCounts.redeemed === null
-                      ? '—'
-                      : dashboardCounts.redeemed}
-                  </p>
-                  <p className="mt-1 text-xs text-cyan-900/60">
-                    พนักงานกดใช้คูปองแล้ว
-                  </p>
-                </div>
-              </div>
-              <p className="text-xs leading-5 text-cyan-900/60">
-                ลำดับการใช้งานคือ สร้าง → ลูกค้ารับ → ใช้จริง
-              </p>
             </header>
 
             <section className="grid gap-4 md:grid-cols-2">
@@ -406,6 +369,49 @@ export default function StaffDashboardPage() {
                 </p>
               </button>
             </section>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="rounded-2xl border border-cyan-100 bg-white/80 px-3 py-2.5 shadow-sm sm:px-4 sm:py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-cyan-700">
+                  สร้างแล้ว
+                </p>
+                <p className="mt-0.5 text-lg font-semibold sm:text-2xl">
+                  {dashboardCounts.given === null ? '—' : dashboardCounts.given}
+                </p>
+                <p className="mt-1 hidden text-xs text-cyan-900/60 sm:block">
+                  คูปองทั้งหมดที่ถูกสร้างในระบบ
+                </p>
+              </div>
+              <div className="rounded-2xl border border-cyan-100 bg-white/80 px-3 py-2.5 shadow-sm sm:px-4 sm:py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-cyan-700">
+                  ลูกค้ารับแล้ว
+                </p>
+                <p className="mt-0.5 text-lg font-semibold sm:text-2xl">
+                  {dashboardCounts.claimed === null
+                    ? '—'
+                    : dashboardCounts.claimed}
+                </p>
+                <p className="mt-1 hidden text-xs text-cyan-900/60 sm:block">
+                  ลูกค้าสแกน QR และกรอกเบอร์โทรแล้ว
+                </p>
+              </div>
+              <div className="rounded-2xl border border-cyan-100 bg-white/80 px-3 py-2.5 shadow-sm sm:col-span-2 sm:px-4 sm:py-3">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-cyan-700">
+                  ใช้แล้ว
+                </p>
+                <p className="mt-0.5 text-lg font-semibold sm:text-2xl">
+                  {dashboardCounts.redeemed === null
+                    ? '—'
+                    : dashboardCounts.redeemed}
+                </p>
+                <p className="mt-1 hidden text-xs text-cyan-900/60 sm:block">
+                  พนักงานกดใช้คูปองแล้ว
+                </p>
+              </div>
+            </div>
+            <p className="text-xs leading-5 text-cyan-900/60">
+              ลำดับการใช้งานคือ สร้าง → ลูกค้ารับ → ใช้จริง
+            </p>
 
             <div className="grid gap-4 md:grid-cols-2">
               <Link
