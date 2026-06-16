@@ -23,6 +23,8 @@ export default function ClaimPage() {
   const [view, setView] = useState<ViewState>({ kind: 'loading' });
   const [phone, setPhone] = useState('');
   const [confirmingClaim, setConfirmingClaim] = useState(false);
+  const [confirmingRedeem, setConfirmingRedeem] = useState(false);
+  const [showRedeemTicket, setShowRedeemTicket] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -55,6 +57,8 @@ export default function ClaimPage() {
 
     setView({ kind: 'claiming' });
     setConfirmingClaim(false);
+    setConfirmingRedeem(false);
+    setShowRedeemTicket(false);
 
     // Atomic claim: only succeeds if still unclaimed.
     // This prevents two people from claiming the same code at once,
@@ -178,21 +182,84 @@ export default function ClaimPage() {
             <p className="text-green-400 font-semibold mb-2">
               ✓ Coupon Claimed!
             </p>
-            <p className="text-neutral-400 text-sm mb-4">
-              Show this screen to staff next time to redeem your free drink.
-            </p>
-            <div className="bg-white rounded-2xl p-4 flex justify-center">
-              <QRCodeSVG value={view.coupon.code} size={176} />
-            </div>
-            <p className="text-neutral-500 text-xs mt-3">
-              Linked to {view.coupon.claimed_by_phone} — non-transferable
-            </p>
-            <Link
-              href="/lookup"
-              className="mt-3 inline-block text-xs text-amber-400 underline underline-offset-4"
-            >
-              Lost this page? Find your coupon
-            </Link>
+            {!showRedeemTicket ? (
+              <>
+                <p className="text-neutral-400 text-sm mb-4">
+                  Your coupon is now linked to your phone number. Tap redeem
+                  when you&apos;re ready to use it.
+                </p>
+                <div className="bg-neutral-800 rounded-2xl p-4 text-left">
+                  <p className="text-xs uppercase tracking-wide text-neutral-500 mb-1">
+                    Coupon code
+                  </p>
+                  <p className="text-neutral-100 font-mono text-lg">
+                    {view.coupon.code}
+                  </p>
+                  <p className="text-neutral-500 text-xs mt-2">
+                    Linked to {view.coupon.claimed_by_phone} — non-transferable
+                  </p>
+                </div>
+                <button
+                  onClick={() => setConfirmingRedeem(true)}
+                  className="mt-4 w-full rounded-xl bg-amber-500 py-3 font-semibold text-neutral-950"
+                >
+                  Redeem Coupon
+                </button>
+                {confirmingRedeem && (
+                  <div className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-left">
+                    <p className="text-amber-300 text-sm font-medium mb-2">
+                      Heads up
+                    </p>
+                    <p className="text-neutral-300 text-sm">
+                      If you continue, this will show the QR code staff needs to
+                      scan. After staff scans it, the coupon is redeemed and
+                      cannot be used again.
+                    </p>
+                    <div className="mt-3 flex gap-2">
+                      <button
+                        onClick={() => setConfirmingRedeem(false)}
+                        className="flex-1 rounded-xl border border-neutral-700 bg-neutral-900 py-2.5 text-sm text-neutral-300"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        onClick={() => {
+                          setConfirmingRedeem(false);
+                          setShowRedeemTicket(true);
+                        }}
+                        className="flex-1 rounded-xl bg-amber-500 py-2.5 text-sm font-semibold text-neutral-950"
+                      >
+                        Continue
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <Link
+                  href="/lookup"
+                  className="mt-3 inline-block text-xs text-amber-400 underline underline-offset-4"
+                >
+                  Lost this page? Find your coupon
+                </Link>
+              </>
+            ) : (
+              <>
+                <p className="text-neutral-400 text-sm mb-4">
+                  Show this QR code to staff so they can redeem your coupon.
+                </p>
+                <div className="bg-white rounded-2xl p-4 flex justify-center">
+                  <QRCodeSVG value={view.coupon.code} size={176} />
+                </div>
+                <p className="text-neutral-500 text-xs mt-3">
+                  {view.coupon.code} • Linked to {view.coupon.claimed_by_phone}
+                </p>
+                <Link
+                  href="/lookup"
+                  className="mt-3 inline-block text-xs text-amber-400 underline underline-offset-4"
+                >
+                  Lost this page? Find your coupon
+                </Link>
+              </>
+            )}
           </div>
         )}
 
