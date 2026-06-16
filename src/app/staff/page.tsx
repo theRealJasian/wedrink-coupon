@@ -45,7 +45,11 @@ export default function StaffDashboardPage() {
     null
   );
   const [scanning, setScanning] = useState(false);
+  const [scannerLoading, setScannerLoading] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const scannerStartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -204,9 +208,13 @@ export default function StaffDashboardPage() {
   }
 
   async function startScan() {
+    if (scannerStartTimerRef.current) {
+      clearTimeout(scannerStartTimerRef.current);
+    }
+
     setScanning(true);
-    setBusyMessage('กำลังเปิดกล้องสแกน…');
-    setTimeout(async () => {
+    setScannerLoading(true);
+    scannerStartTimerRef.current = setTimeout(async () => {
       const scanner = new Html5Qrcode('staff-qr-reader');
       scannerRef.current = scanner;
 
@@ -217,25 +225,32 @@ export default function StaffDashboardPage() {
           async (decodedText) => {
             await scanner.stop();
             setScanning(false);
+            setScannerLoading(false);
             await lookupCouponByCode(decodedText);
           },
           undefined
         );
-        setBusyMessage(null);
+        setScannerLoading(false);
       } catch {
         setScanning(false);
-        setBusyMessage(null);
+        setScannerLoading(false);
       }
     }, 100);
   }
 
   async function stopScan() {
+    if (scannerStartTimerRef.current) {
+      clearTimeout(scannerStartTimerRef.current);
+      scannerStartTimerRef.current = null;
+    }
+
     if (scannerRef.current) {
       try {
         await scannerRef.current.stop();
       } catch {}
     }
     setScanning(false);
+    setScannerLoading(false);
     setBusyMessage(null);
   }
 
@@ -420,6 +435,11 @@ export default function StaffDashboardPage() {
 
             {scanning && (
               <div className="rounded-3xl border border-cyan-100 bg-white/80 p-4">
+                {scannerLoading && (
+                  <p className="mb-3 text-sm font-medium text-cyan-700">
+                    กำลังเปิดกล้อง… ถ้ากล้องขึ้นแล้ว ข้อความนี้จะหายไปเอง
+                  </p>
+                )}
                 <div id="staff-qr-reader" className="overflow-hidden rounded-2xl" />
                 <button
                   onClick={stopScan}
