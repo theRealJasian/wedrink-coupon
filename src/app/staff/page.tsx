@@ -33,7 +33,7 @@ export default function StaffDashboardPage() {
   const [generationLoading, setGenerationLoading] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [generatedCoupon, setGeneratedCoupon] = useState<Coupon | null>(null);
-  const [manualCode, setManualCode] = useState('');
+  const [manualCodeSuffix, setManualCodeSuffix] = useState('');
   const [couponState, setCouponState] = useState<CouponLookupState>({
     kind: 'idle',
   });
@@ -134,6 +134,15 @@ export default function StaffDashboardPage() {
     setBusyMessage(null);
   }
 
+  function handleManualCodeChange(value: string) {
+    const cleaned = value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    setManualCodeSuffix(cleaned.slice(0, 6));
+  }
+
+  function getManualCodeValue() {
+    return manualCodeSuffix ? `WD-${manualCodeSuffix}` : 'WD-';
+  }
+
   async function lookupByPhone() {
     const cleanPhone = phoneLookup.trim();
 
@@ -212,6 +221,7 @@ export default function StaffDashboardPage() {
           },
           undefined
         );
+        setBusyMessage(null);
       } catch {
         setScanning(false);
         setBusyMessage(null);
@@ -421,14 +431,22 @@ export default function StaffDashboardPage() {
             )}
 
             <div className="flex gap-2">
-              <input
-                value={manualCode}
-                onChange={(e) => setManualCode(e.target.value)}
-                placeholder="WD-XXXXXX"
-                className="flex-1 rounded-2xl border border-cyan-100 bg-white/80 px-4 py-3 text-sm outline-none focus:border-cyan-500"
-              />
+              <div className="flex flex-1 overflow-hidden rounded-2xl border border-cyan-100 bg-white/80">
+                <div className="flex items-center border-r border-cyan-100 bg-cyan-50 px-4 text-sm font-semibold text-cyan-700">
+                  WD-
+                </div>
+                <input
+                  value={manualCodeSuffix}
+                  onChange={(e) => handleManualCodeChange(e.target.value)}
+                  placeholder="XXXXXX"
+                  inputMode="text"
+                  autoCapitalize="characters"
+                  spellCheck={false}
+                  className="min-w-0 flex-1 bg-transparent px-4 py-3 text-sm uppercase tracking-wider outline-none"
+                />
+              </div>
               <button
-                onClick={() => lookupCouponByCode(manualCode)}
+                onClick={() => lookupCouponByCode(getManualCodeValue())}
                 className="rounded-2xl bg-cyan-500 px-5 font-semibold text-white"
               >
                 ตรวจสอบ
