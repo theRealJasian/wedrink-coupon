@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { QRCodeCanvas } from 'qrcode.react';
 import { supabase, type Coupon } from '@/lib/supabase';
+import BrandLogo from '@/components/BrandLogo';
 
 type ViewState =
   | { kind: 'loading' }
@@ -81,12 +82,15 @@ export default function ClaimPage() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col items-center justify-center p-6">
+    <main className="min-h-screen text-cyan-950 flex flex-col items-center justify-center p-6">
       <div className="w-full max-w-sm">
+        <div className="mb-4 flex justify-center">
+          <BrandLogo />
+        </div>
         <h1 className="text-xl font-semibold text-center mb-1">
           WeDrink U-Thong ☕
         </h1>
-        <p className="text-center text-amber-400 text-sm mb-8">
+        <p className="text-center text-cyan-600 text-sm mb-8">
           Buy One Get One Free — Coffee Promo
         </p>
 
@@ -95,17 +99,17 @@ export default function ClaimPage() {
         )}
 
         {view.kind === 'not_found' && (
-          <div className="bg-neutral-900 rounded-2xl p-6 text-center">
-            <p className="text-red-400 font-medium">Coupon not found</p>
-            <p className="text-neutral-500 text-sm mt-2">
+          <div className="bg-white/80 rounded-2xl p-6 text-center border border-cyan-100">
+            <p className="font-medium text-cyan-700">Coupon not found</p>
+            <p className="text-cyan-900/60 text-sm mt-2">
               This link doesn&apos;t match a valid coupon.
             </p>
           </div>
         )}
 
         {view.kind === 'ready_to_claim' && (
-          <div className="bg-neutral-900 rounded-2xl p-6">
-            <p className="text-sm text-neutral-300 mb-4">
+          <div className="bg-white/80 rounded-2xl p-6 border border-cyan-100 shadow-sm">
+            <p className="text-sm text-cyan-900/70 mb-4">
               Enter your phone number to claim your free drink coupon. This
               coupon can only be used by you.
             </p>
@@ -114,33 +118,33 @@ export default function ClaimPage() {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="08X-XXX-XXXX"
-              className="w-full bg-neutral-800 rounded-xl px-4 py-3 text-sm outline-none border border-neutral-700 focus:border-amber-500 mb-3"
+              className="w-full rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm outline-none focus:border-cyan-500 mb-3"
             />
             <button
               onClick={() => setConfirmingClaim(true)}
-              className="w-full bg-amber-500 hover:bg-amber-400 text-neutral-950 font-semibold py-3 rounded-xl"
+              className="w-full rounded-xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
             >
               Claim My Coupon
             </button>
             {confirmingClaim && (
-              <div className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-left">
-                <p className="text-amber-300 text-sm font-medium mb-2">
+              <div className="mt-3 rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-left">
+                <p className="text-cyan-700 text-sm font-medium mb-2">
                   Final step
                 </p>
-                <p className="text-neutral-300 text-sm">
+                <p className="text-cyan-900/70 text-sm">
                   If you claim this coupon, it will be linked to your phone
                   number and cannot be transferred to someone else.
                 </p>
                 <div className="mt-3 flex gap-2">
                   <button
                     onClick={() => setConfirmingClaim(false)}
-                    className="flex-1 rounded-xl border border-neutral-700 bg-neutral-900 py-2.5 text-sm text-neutral-300"
+                    className="flex-1 rounded-xl border border-cyan-200 bg-white py-2.5 text-sm text-cyan-900/70"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleClaim}
-                    className="flex-1 rounded-xl bg-amber-500 py-2.5 text-sm font-semibold text-neutral-950"
+                    className="flex-1 rounded-xl bg-cyan-500 py-2.5 text-sm font-semibold text-white"
                   >
                     Yes, claim it
                   </button>
@@ -155,18 +159,18 @@ export default function ClaimPage() {
         )}
 
         {view.kind === 'claim_error' && (
-          <div className="bg-neutral-900 rounded-2xl p-6">
-            <p className="text-red-400 text-sm mb-4">{view.message}</p>
+          <div className="bg-white/80 rounded-2xl p-6 border border-cyan-100">
+            <p className="text-cyan-700 text-sm mb-4">{view.message}</p>
             <input
               type="tel"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="08X-XXX-XXXX"
-              className="w-full bg-neutral-800 rounded-xl px-4 py-3 text-sm outline-none border border-neutral-700 focus:border-amber-500 mb-3"
+              className="w-full rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm outline-none focus:border-cyan-500 mb-3"
             />
             <button
               onClick={handleClaim}
-              className="w-full bg-amber-500 text-neutral-950 font-semibold py-3 rounded-xl"
+              className="w-full rounded-xl bg-cyan-500 py-3 font-semibold text-white"
             >
               Try Again
             </button>
@@ -174,35 +178,35 @@ export default function ClaimPage() {
         )}
 
         {view.kind === 'claimed' && (
-          <div className="bg-neutral-900 rounded-2xl p-6 text-center">
-            <p className="text-green-400 font-semibold mb-2">
+          <div className="bg-white/80 rounded-2xl p-6 text-center border border-cyan-100 shadow-sm">
+            <p className="text-cyan-700 font-semibold mb-2">
               ✓ Coupon Claimed!
             </p>
-            <p className="text-neutral-400 text-sm mb-4">
+            <p className="text-cyan-900/70 text-sm mb-4">
               Show this QR code to staff when you want to redeem your free
               drink.
             </p>
-            <div className="bg-white rounded-2xl p-5 flex min-h-[260px] items-center justify-center">
+            <div className="bg-white rounded-2xl p-5 flex min-h-[260px] items-center justify-center border border-cyan-100">
               <QRCodeCanvas
                 value={view.coupon.code}
                 size={220}
                 aria-label={`Coupon QR code for ${view.coupon.code}`}
               />
             </div>
-            <div className="mt-4 rounded-2xl bg-neutral-800 p-4 text-left">
-              <p className="text-xs uppercase tracking-wide text-neutral-500 mb-1">
+            <div className="mt-4 rounded-2xl bg-cyan-50 p-4 text-left">
+              <p className="text-xs uppercase tracking-wide text-cyan-700 mb-1">
                 Coupon code
               </p>
-              <p className="text-neutral-100 font-mono text-lg">
+              <p className="font-mono text-lg text-cyan-950">
                 {view.coupon.code}
               </p>
-              <p className="text-neutral-500 text-xs mt-2">
+              <p className="text-cyan-900/60 text-xs mt-2">
                 Linked to {view.coupon.claimed_by_phone} — non-transferable
               </p>
             </div>
             <Link
               href="/lookup"
-              className="mt-3 inline-block text-xs text-amber-400 underline underline-offset-4"
+              className="mt-3 inline-block text-xs text-cyan-700 underline underline-offset-4"
             >
               Lost this page? Find your coupon
             </Link>
@@ -210,11 +214,11 @@ export default function ClaimPage() {
         )}
 
         {view.kind === 'redeemed' && (
-          <div className="bg-neutral-900 rounded-2xl p-6 text-center">
-            <p className="text-neutral-300 font-medium">
+          <div className="bg-white/80 rounded-2xl p-6 text-center border border-cyan-100">
+            <p className="font-medium text-cyan-900/80">
               This coupon has already been used
             </p>
-            <p className="text-neutral-500 text-sm mt-2">
+            <p className="text-cyan-900/60 text-sm mt-2">
               Redeemed on{' '}
               {new Date(view.coupon.redeemed_at!).toLocaleDateString()}
             </p>

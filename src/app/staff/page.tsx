@@ -6,6 +6,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { generateCouponCode } from '@/lib/codeGenerator';
 import { supabase, type Coupon } from '@/lib/supabase';
+import BrandLogo from '@/components/BrandLogo';
 
 type Screen = 'home' | 'generate' | 'redeem' | 'lookup';
 
@@ -218,16 +219,17 @@ export default function StaffDashboardPage() {
     : null;
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100 p-6">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.16),_transparent_40%),linear-gradient(180deg,_#f7feff_0%,_#ecfeff_100%)] text-cyan-950 p-6">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
         {screen === 'home' && (
           <>
             <header className="pt-4">
+              <BrandLogo />
               <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">
                 WeDrink U-Thong
               </p>
               <h1 className="mt-2 text-3xl font-semibold">Staff Dashboard</h1>
-              <p className="mt-2 max-w-2xl text-sm text-neutral-400">
+              <p className="mt-2 max-w-2xl text-sm text-cyan-900/60">
                 Pick what you want to do. Generate a coupon, redeem one, or
                 look up a phone number.
               </p>
@@ -236,39 +238,39 @@ export default function StaffDashboardPage() {
             <section className="grid gap-4 md:grid-cols-3">
               <button
                 onClick={() => setScreen('generate')}
-                className="rounded-3xl bg-neutral-900 p-6 text-left transition hover:-translate-y-0.5 hover:bg-neutral-800"
+                className="rounded-3xl border border-cyan-100 bg-white/80 p-6 text-left transition hover:-translate-y-0.5 hover:border-cyan-300"
               >
-                <p className="text-xs uppercase tracking-wide text-neutral-500">
+                <p className="text-xs uppercase tracking-wide text-cyan-700">
                   Action 1
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold">Generate</h2>
-                <p className="mt-2 text-sm text-neutral-400">
+                <p className="mt-2 text-sm text-cyan-900/60">
                   Make a new coupon and show the customer QR.
                 </p>
               </button>
 
               <button
                 onClick={() => setScreen('redeem')}
-                className="rounded-3xl bg-neutral-900 p-6 text-left transition hover:-translate-y-0.5 hover:bg-neutral-800"
+                className="rounded-3xl border border-cyan-100 bg-white/80 p-6 text-left transition hover:-translate-y-0.5 hover:border-cyan-300"
               >
-                <p className="text-xs uppercase tracking-wide text-neutral-500">
+                <p className="text-xs uppercase tracking-wide text-cyan-700">
                   Action 2
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold">Redeem</h2>
-                <p className="mt-2 text-sm text-neutral-400">
+                <p className="mt-2 text-sm text-cyan-900/60">
                   Scan a customer QR or enter a coupon code.
                 </p>
               </button>
 
               <button
                 onClick={() => setScreen('lookup')}
-                className="rounded-3xl bg-neutral-900 p-6 text-left transition hover:-translate-y-0.5 hover:bg-neutral-800"
+                className="rounded-3xl border border-cyan-100 bg-white/80 p-6 text-left transition hover:-translate-y-0.5 hover:border-cyan-300"
               >
-                <p className="text-xs uppercase tracking-wide text-neutral-500">
+                <p className="text-xs uppercase tracking-wide text-cyan-700">
                   Action 3
                 </p>
                 <h2 className="mt-2 text-2xl font-semibold">Lookup</h2>
-                <p className="mt-2 text-sm text-neutral-400">
+                <p className="mt-2 text-sm text-cyan-900/60">
                   Search by phone number and pull up the customer&apos;s QR.
                 </p>
               </button>
@@ -277,13 +279,13 @@ export default function StaffDashboardPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <Link
                 href="/lookup"
-                className="rounded-2xl border border-neutral-800 bg-neutral-900 px-5 py-4 text-sm text-neutral-300 transition hover:border-amber-500/60"
+                className="rounded-2xl border border-cyan-100 bg-white/80 px-5 py-4 text-sm text-cyan-900/70 transition hover:border-cyan-300"
               >
                 Customer lookup page →
               </Link>
               <Link
                 href="/claim"
-                className="rounded-2xl border border-neutral-800 bg-neutral-900 px-5 py-4 text-sm text-neutral-300 transition hover:border-amber-500/60"
+                className="rounded-2xl border border-cyan-100 bg-white/80 px-5 py-4 text-sm text-cyan-900/70 transition hover:border-cyan-300"
               >
                 Claim route for customers →
               </Link>
@@ -294,11 +296,11 @@ export default function StaffDashboardPage() {
         {screen === 'generate' && (
           <ActionFrame
             title="Generate coupon"
-            subtitle="Create a new coupon and show the customer QR."
-            onBack={() => setScreen('home')}
-          >
-            <div className="rounded-2xl bg-neutral-900 p-5 text-center">
-              <p className="text-xs uppercase tracking-wide text-neutral-500">
+              subtitle="Create a new coupon and show the customer QR."
+              onBack={() => setScreen('home')}
+            >
+            <div className="rounded-2xl border border-cyan-100 bg-white/80 p-5 text-center">
+              <p className="text-xs uppercase tracking-wide text-cyan-700">
                 Coupons Remaining
               </p>
               <p className="mt-2 text-4xl font-bold">
@@ -309,7 +311,7 @@ export default function StaffDashboardPage() {
             <button
               onClick={generateCoupon}
               disabled={generationLoading || remaining === 0}
-              className="w-full rounded-2xl bg-amber-500 py-4 text-lg font-semibold text-neutral-950 disabled:bg-neutral-700 disabled:text-neutral-400"
+              className="w-full rounded-2xl bg-cyan-500 py-4 text-lg font-semibold text-white disabled:bg-cyan-200 disabled:text-cyan-900/50"
             >
               {generationLoading
                 ? 'Generating…'
@@ -319,12 +321,12 @@ export default function StaffDashboardPage() {
             </button>
 
             {generationError && (
-              <p className="text-sm text-red-400">{generationError}</p>
+              <p className="text-sm text-cyan-700">{generationError}</p>
             )}
 
             {generatedCoupon && generatedClaimUrl && (
-              <div className="rounded-3xl bg-white p-5 text-center">
-                <p className="text-sm font-medium text-neutral-900">
+              <div className="rounded-3xl bg-white p-5 text-center border border-cyan-100">
+                <p className="text-sm font-medium text-cyan-950">
                   Customer scans this QR
                 </p>
                 <div className="mt-4 flex justify-center">
@@ -335,7 +337,7 @@ export default function StaffDashboardPage() {
                 </p>
                 <button
                   onClick={() => setGeneratedCoupon(null)}
-                  className="mt-4 w-full rounded-xl bg-neutral-900 py-3 font-medium text-white"
+                  className="mt-4 w-full rounded-xl bg-cyan-950 py-3 font-medium text-white"
                 >
                   Done
                 </button>
@@ -353,17 +355,17 @@ export default function StaffDashboardPage() {
             <button
               onClick={startScan}
               disabled={scanning}
-              className="w-full rounded-2xl bg-neutral-800 py-4 text-lg font-semibold transition hover:bg-neutral-700 disabled:opacity-60"
+              className="w-full rounded-2xl bg-cyan-950 py-4 text-lg font-semibold text-white transition hover:bg-cyan-900 disabled:opacity-60"
             >
               {scanning ? 'Scanning…' : 'Scan customer QR'}
             </button>
 
             {scanning && (
-              <div className="rounded-3xl bg-neutral-900 p-4">
+              <div className="rounded-3xl border border-cyan-100 bg-white/80 p-4">
                 <div id="staff-qr-reader" className="overflow-hidden rounded-2xl" />
                 <button
                   onClick={stopScan}
-                  className="mt-3 w-full rounded-xl bg-neutral-800 py-3 text-sm"
+                  className="mt-3 w-full rounded-xl bg-cyan-100 py-3 text-sm text-cyan-950"
                 >
                   Cancel scan
                 </button>
@@ -375,22 +377,22 @@ export default function StaffDashboardPage() {
                 value={manualCode}
                 onChange={(e) => setManualCode(e.target.value)}
                 placeholder="WD-XXXXXX"
-                className="flex-1 rounded-2xl border border-neutral-800 bg-neutral-950 px-4 py-3 text-sm outline-none focus:border-amber-500"
+                className="flex-1 rounded-2xl border border-cyan-100 bg-white/80 px-4 py-3 text-sm outline-none focus:border-cyan-500"
               />
               <button
                 onClick={() => lookupCouponByCode(manualCode)}
-                className="rounded-2xl bg-amber-500 px-5 font-semibold text-neutral-950"
+                className="rounded-2xl bg-cyan-500 px-5 font-semibold text-white"
               >
                 Check
               </button>
             </div>
 
             {couponState.kind === 'loading' && (
-              <p className="text-sm text-neutral-400">Checking…</p>
+              <p className="text-sm text-cyan-900/60">Checking…</p>
             )}
 
             {couponState.kind === 'not_found' && (
-              <p className="text-sm text-red-400">
+              <p className="text-sm text-cyan-700">
                 Coupon not found. Double-check the code.
               </p>
             )}
@@ -412,22 +414,22 @@ export default function StaffDashboardPage() {
                 value={phoneLookup}
                 onChange={(e) => setPhoneLookup(e.target.value)}
                 placeholder="08X-XXX-XXXX"
-                className="flex-1 rounded-2xl border border-neutral-800 bg-neutral-950 px-4 py-3 text-sm outline-none focus:border-amber-500"
+                className="flex-1 rounded-2xl border border-cyan-100 bg-white/80 px-4 py-3 text-sm outline-none focus:border-cyan-500"
               />
               <button
                 onClick={lookupByPhone}
-                className="rounded-2xl bg-amber-500 px-5 font-semibold text-neutral-950"
+                className="rounded-2xl bg-cyan-500 px-5 font-semibold text-white"
               >
                 Search
               </button>
             </div>
 
             {phoneState.kind === 'loading' && (
-              <p className="text-sm text-neutral-400">Searching…</p>
+              <p className="text-sm text-cyan-900/60">Searching…</p>
             )}
 
             {phoneState.kind === 'not_found' && (
-              <p className="text-sm text-red-400">
+              <p className="text-sm text-cyan-700">
                 No claimed coupons found for that phone number.
               </p>
             )}
@@ -444,8 +446,8 @@ export default function StaffDashboardPage() {
                       onClick={() => setSelectedPhoneCoupon(coupon)}
                       className={`w-full rounded-3xl border p-5 text-left transition ${
                         isSelected
-                          ? 'border-amber-500 bg-amber-500/10'
-                          : 'border-neutral-800 bg-neutral-900 hover:border-neutral-700'
+                          ? 'border-cyan-400 bg-cyan-50'
+                          : 'border-cyan-100 bg-white/80 hover:border-cyan-300'
                       }`}
                     >
                       <div className="flex items-start justify-between gap-3">
@@ -460,8 +462,8 @@ export default function StaffDashboardPage() {
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-medium ${
                             isRedeemed
-                              ? 'bg-red-500/15 text-red-300'
-                              : 'bg-amber-500/15 text-amber-300'
+                              ? 'bg-cyan-100 text-cyan-900'
+                              : 'bg-cyan-500/15 text-cyan-700'
                           }`}
                         >
                           {coupon.status}
@@ -472,22 +474,22 @@ export default function StaffDashboardPage() {
                 })}
 
                 {selectedPhoneCoupon && (
-                  <div className="rounded-3xl bg-neutral-900 p-5">
-                    <p className="text-sm text-neutral-300">
+                  <div className="rounded-3xl border border-cyan-100 bg-white/80 p-5">
+                    <p className="text-sm text-cyan-900/70">
                       {selectedPhoneCoupon.status === 'redeemed'
                         ? 'Already redeemed'
                         : 'QR for staff to scan'}
                     </p>
-                    <div className="mt-4 flex justify-center rounded-2xl bg-white p-4">
+                    <div className="mt-4 flex justify-center rounded-2xl bg-white p-4 border border-cyan-100">
                       <QRCodeSVG value={selectedPhoneCoupon.code} size={220} />
                     </div>
-                    <p className="mt-3 text-center text-xs text-neutral-500">
+                    <p className="mt-3 text-center text-xs text-cyan-900/60">
                       {selectedPhoneCoupon.code}
                     </p>
                     {selectedPhoneCoupon.status === 'claimed' && (
                       <button
                         onClick={() => markRedeemed(selectedPhoneCoupon)}
-                        className="mt-4 w-full rounded-2xl bg-green-500 py-3 font-semibold text-neutral-950 hover:bg-green-400"
+                        className="mt-4 w-full rounded-2xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
                       >
                         Redeem for customer
                       </button>
@@ -519,12 +521,12 @@ function ActionFrame({
       <header className="pt-4">
         <button
           onClick={onBack}
-          className="text-sm text-neutral-400 underline underline-offset-4"
+          className="text-sm text-cyan-700 underline underline-offset-4"
         >
           ← Back to dashboard
         </button>
         <h1 className="mt-4 text-3xl font-semibold">{title}</h1>
-        <p className="mt-2 max-w-2xl text-sm text-neutral-400">{subtitle}</p>
+        <p className="mt-2 max-w-2xl text-sm text-cyan-900/60">{subtitle}</p>
       </header>
 
       <section className="mx-auto w-full max-w-xl space-y-4">{children}</section>
@@ -541,9 +543,9 @@ function CouponResult({
 }) {
   if (coupon.status === 'unclaimed') {
     return (
-      <div className="rounded-3xl bg-neutral-900 p-5 text-sm">
-        <p className="mb-1 font-medium text-yellow-400">Not yet claimed</p>
-        <p className="text-neutral-400">
+      <div className="rounded-3xl border border-cyan-100 bg-white/80 p-5 text-sm">
+        <p className="mb-1 font-medium text-cyan-700">Not yet claimed</p>
+        <p className="text-cyan-900/60">
           This coupon hasn&apos;t been claimed by a customer yet.
         </p>
       </div>
@@ -552,9 +554,9 @@ function CouponResult({
 
   if (coupon.status === 'redeemed') {
     return (
-      <div className="rounded-3xl bg-neutral-900 p-5 text-sm">
-        <p className="mb-1 font-medium text-red-400">Already redeemed</p>
-        <p className="text-neutral-400">
+      <div className="rounded-3xl border border-cyan-100 bg-white/80 p-5 text-sm">
+        <p className="mb-1 font-medium text-cyan-700">Already redeemed</p>
+        <p className="text-cyan-900/60">
           Used on {new Date(coupon.redeemed_at!).toLocaleString()}.
         </p>
       </div>
@@ -562,14 +564,14 @@ function CouponResult({
   }
 
   return (
-    <div className="rounded-3xl bg-neutral-900 p-5 text-sm">
-      <p className="mb-1 font-medium text-green-400">Valid — ready to redeem</p>
-      <p className="mb-3 text-neutral-400">
+    <div className="rounded-3xl border border-cyan-100 bg-white/80 p-5 text-sm">
+      <p className="mb-1 font-medium text-cyan-700">Valid — ready to redeem</p>
+      <p className="mb-3 text-cyan-900/60">
         Claimed by phone: {coupon.claimed_by_phone}
       </p>
       <button
         onClick={() => onRedeem(coupon)}
-        className="w-full rounded-2xl bg-green-500 py-3 font-semibold text-neutral-950 hover:bg-green-400"
+        className="w-full rounded-2xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
       >
         Redeem for customer
       </button>

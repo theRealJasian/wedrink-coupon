@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { supabase, type Coupon } from '@/lib/supabase';
+import BrandLogo from '@/components/BrandLogo';
 
 type LookupState =
   | { kind: 'idle' }
@@ -45,17 +46,20 @@ export default function LookupPage() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-neutral-100 flex flex-col items-center justify-center p-6">
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 text-cyan-950">
       <div className="w-full max-w-sm">
+        <div className="mb-4 flex justify-center">
+          <BrandLogo />
+        </div>
         <h1 className="text-xl font-semibold text-center mb-1">
           Find My Coupon
         </h1>
-        <p className="text-center text-amber-400 text-sm mb-8">
+        <p className="text-center text-cyan-600 text-sm mb-8">
           Enter the phone number you used to claim it
         </p>
 
-        <div className="bg-neutral-900 rounded-2xl p-6 mb-4">
-          <label className="block text-xs uppercase tracking-wide text-neutral-500 mb-2">
+        <div className="bg-white/80 rounded-2xl p-6 mb-4 border border-cyan-100">
+          <label className="block text-xs uppercase tracking-wide text-cyan-700 mb-2">
             Phone number
           </label>
           <input
@@ -63,30 +67,30 @@ export default function LookupPage() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             placeholder="08X-XXX-XXXX"
-            className="w-full bg-neutral-800 rounded-xl px-4 py-3 text-sm outline-none border border-neutral-700 focus:border-amber-500"
+            className="w-full rounded-xl border border-cyan-100 bg-cyan-50 px-4 py-3 text-sm outline-none focus:border-cyan-500"
           />
           <button
             onClick={handleLookup}
-            className="w-full mt-3 bg-amber-500 hover:bg-amber-400 text-neutral-950 font-semibold py-3 rounded-xl"
+            className="w-full mt-3 bg-cyan-500 hover:bg-cyan-400 text-white font-semibold py-3 rounded-xl"
           >
             Find My Coupon
           </button>
         </div>
 
         {state.kind === 'loading' && (
-          <p className="text-center text-neutral-400 text-sm">Looking up…</p>
+          <p className="text-center text-cyan-900/60 text-sm">Looking up…</p>
         )}
 
         {state.kind === 'error' && (
-          <p className="text-center text-red-400 text-sm">{state.message}</p>
+          <p className="text-center text-cyan-700 text-sm">{state.message}</p>
         )}
 
         {state.kind === 'loaded' && (
           <div className="space-y-3">
             {state.coupons.length === 0 ? (
-              <div className="bg-neutral-900 rounded-2xl p-6 text-center">
-                <p className="text-neutral-300 font-medium">No coupons found</p>
-                <p className="text-neutral-500 text-sm mt-2">
+              <div className="bg-white/80 rounded-2xl p-6 text-center border border-cyan-100">
+                <p className="text-cyan-900 font-medium">No coupons found</p>
+                <p className="text-cyan-900/60 text-sm mt-2">
                   We couldn&apos;t find any claimed coupons for that phone
                   number.
                 </p>
@@ -99,28 +103,28 @@ export default function LookupPage() {
                   <Link
                     key={coupon.id}
                     href={`/claim/${coupon.code}`}
-                    className="block bg-neutral-900 rounded-2xl p-5 border border-neutral-800 hover:border-amber-500/60 transition"
+                    className="block bg-white/80 rounded-2xl p-5 border border-cyan-100 hover:border-cyan-300 transition"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <p className="text-sm text-neutral-500 mb-1">
+                        <p className="text-sm text-cyan-700 mb-1">
                           {isRedeemed ? 'Already used' : 'Valid — tap to view'}
                         </p>
-                        <p className="text-lg font-semibold text-neutral-100">
+                        <p className="text-lg font-semibold text-cyan-950">
                           {coupon.code}
                         </p>
                       </div>
                       <span
                         className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
                           isRedeemed
-                            ? 'bg-red-500/15 text-red-300'
-                            : 'bg-amber-500/15 text-amber-300'
+                            ? 'bg-cyan-100 text-cyan-900'
+                            : 'bg-cyan-500/15 text-cyan-700'
                         }`}
                       >
                         {coupon.status}
                       </span>
                     </div>
-                    <p className="mt-3 text-xs text-neutral-500">
+                    <p className="mt-3 text-xs text-cyan-900/60">
                       Claimed{' '}
                       {coupon.claimed_at
                         ? new Date(coupon.claimed_at).toLocaleString()
