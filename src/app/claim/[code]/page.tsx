@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCodeCanvas } from 'qrcode.react';
 import { supabase, type Coupon } from '@/lib/supabase';
 
 type ViewState =
@@ -182,8 +182,12 @@ export default function ClaimPage() {
               Show this QR code to staff when you want to redeem your free
               drink.
             </p>
-            <div className="bg-white rounded-2xl p-4 flex justify-center">
-              <QRCodeSVG value={view.coupon.code} size={176} />
+            <div className="bg-white rounded-2xl p-5 flex min-h-[260px] items-center justify-center">
+              <QRCodeCanvas
+                value={view.coupon.code}
+                size={220}
+                aria-label={`Coupon QR code for ${view.coupon.code}`}
+              />
             </div>
             <div className="mt-4 rounded-2xl bg-neutral-800 p-4 text-left">
               <p className="text-xs uppercase tracking-wide text-neutral-500 mb-1">
