@@ -28,6 +28,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 export default function StaffDashboardPage() {
   const [screen, setScreen] = useState<Screen>('home');
+  const [busyMessage, setBusyMessage] = useState<string | null>(null);
   const [remaining, setRemaining] = useState<number | null>(null);
   const [generationLoading, setGenerationLoading] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
@@ -76,6 +77,7 @@ export default function StaffDashboardPage() {
 
   async function generateCoupon() {
     setGenerationLoading(true);
+    setBusyMessage('กำลังสร้างคูปอง…');
     setGenerationError(null);
     setGeneratedCoupon(null);
 
@@ -94,23 +96,27 @@ export default function StaffDashboardPage() {
           : 'เกิดข้อผิดพลาดตอนสร้างคูปอง 😅'
       );
       setGenerationLoading(false);
+      setBusyMessage(null);
       return;
     }
 
     setGeneratedCoupon(data as Coupon);
     await refreshRemaining();
     setGenerationLoading(false);
+    setBusyMessage(null);
   }
 
   async function lookupCouponByCode(rawInput: string) {
     const code = rawInput.trim().split('/').pop()?.toUpperCase();
 
     if (!code) {
+      setBusyMessage(null);
       setCouponState({ kind: 'not_found' });
       return;
     }
 
     setCouponState({ kind: 'loading' });
+    setBusyMessage('กำลังตรวจสอบรหัส…');
 
     const { data, error } = await supabase
       .from('coupons')
@@ -120,16 +126,19 @@ export default function StaffDashboardPage() {
 
     if (error || !data) {
       setCouponState({ kind: 'not_found' });
+      setBusyMessage(null);
       return;
     }
 
     setCouponState({ kind: 'found', coupon: data as Coupon });
+    setBusyMessage(null);
   }
 
   async function lookupByPhone() {
     const cleanPhone = phoneLookup.trim();
 
     if (!cleanPhone) {
+      setBusyMessage(null);
       setPhoneState({ kind: 'not_found' });
       setSelectedPhoneCoupon(null);
       return;
@@ -137,6 +146,7 @@ export default function StaffDashboardPage() {
 
     setPhoneState({ kind: 'loading' });
     setSelectedPhoneCoupon(null);
+    setBusyMessage('กำลังค้นหาเบอร์โทร…');
 
     const { data, error } = await supabase
       .from('coupons')
@@ -146,15 +156,18 @@ export default function StaffDashboardPage() {
 
     if (error || !data || data.length === 0) {
       setPhoneState({ kind: 'not_found' });
+      setBusyMessage(null);
       return;
     }
 
     const coupons = data as Coupon[];
     setPhoneState({ kind: 'found', coupons });
     setSelectedPhoneCoupon(coupons[0]);
+    setBusyMessage(null);
   }
 
   async function markRedeemed(coupon: Coupon) {
+    setBusyMessage('กำลังใช้คูปอง…');
     const { data, error } = await supabase
       .from('coupons')
       .update({ status: 'redeemed', redeemed_at: new Date().toISOString() })
@@ -178,10 +191,12 @@ export default function StaffDashboardPage() {
           : current
       );
     }
+    setBusyMessage(null);
   }
 
   async function startScan() {
     setScanning(true);
+    setBusyMessage('กำลังเปิดกล้องสแกน…');
     setTimeout(async () => {
       const scanner = new Html5Qrcode('staff-qr-reader');
       scannerRef.current = scanner;
@@ -199,6 +214,7 @@ export default function StaffDashboardPage() {
         );
       } catch {
         setScanning(false);
+        setBusyMessage(null);
       }
     }, 100);
   }
@@ -210,6 +226,7 @@ export default function StaffDashboardPage() {
       } catch {}
     }
     setScanning(false);
+    setBusyMessage(null);
   }
 
   const generatedClaimUrl = generatedCoupon
@@ -219,6 +236,8 @@ export default function StaffDashboardPage() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.16),_transparent_40%),linear-gradient(180deg,_#f7feff_0%,_#ecfeff_100%)] px-4 py-5 sm:p-6 text-cyan-950">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+        {busyMessage && <LoadingOverlay message={busyMessage} />}
+
         {screen === 'home' && (
           <>
             <header className="pt-4">
@@ -543,6 +562,18 @@ export default function StaffDashboardPage() {
         )}
       </div>
     </main>
+  );
+}
+
+function LoadingOverlay({ message }: { message: string }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-cyan-950/20 px-4 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-3xl border border-cyan-100 bg-white p-6 text-center shadow-2xl">
+        <div className="mx-auto mb-4 h-10 w-10 rounded-full border-4 border-cyan-200 border-t-cyan-500 loading-ring" />
+        <p className="text-lg font-semibold text-cyan-950">{message}</p>
+        <p className="mt-1 text-sm text-cyan-900/60">กรุณารอสักครู่…</p>
+      </div>
+    </div>
   );
 }
 

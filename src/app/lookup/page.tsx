@@ -78,7 +78,7 @@ export default function LookupPage() {
         </div>
 
         {state.kind === 'loading' && (
-          <p className="text-center text-cyan-900/60 text-sm">กำลังค้นหา…</p>
+          <LoadingPanel message="กำลังค้นหาคูปอง…" />
         )}
 
         {state.kind === 'error' && (
@@ -137,5 +137,15 @@ export default function LookupPage() {
         )}
       </div>
     </main>
+  );
+}
+
+function LoadingPanel({ message }: { message: string }) {
+  return (
+    <div className="rounded-2xl border border-cyan-100 bg-white/80 p-6 text-center shadow-sm">
+      <div className="mx-auto mb-3 h-8 w-8 rounded-full border-4 border-cyan-200 border-t-cyan-500 loading-ring" />
+      <p className="text-sm font-medium text-cyan-900">{message}</p>
+      <p className="mt-1 text-xs text-cyan-900/60">กรุณารอสักครู่…</p>
+    </div>
   );
 }

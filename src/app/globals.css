@@ -27,3 +27,13 @@ body {
     radial-gradient(circle at top, rgba(34, 211, 238, 0.14), transparent 40%),
     linear-gradient(180deg, #f7feff 0%, #ecfeff 100%);
 }
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-ring {
+  animation: spin 0.8s linear infinite;
+}

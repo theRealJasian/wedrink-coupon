@@ -101,7 +101,7 @@ export default function ClaimPage() {
         </p>
 
         {view.kind === 'loading' && (
-          <p className="text-center text-cyan-900/60">กำลังโหลด…</p>
+          <LoadingPanel message="กำลังโหลดคูปอง…" />
         )}
 
         {view.kind === 'not_found' && (
@@ -159,7 +159,7 @@ export default function ClaimPage() {
         )}
 
         {view.kind === 'claiming' && (
-          <p className="text-center text-cyan-900/60">กำลังรับคูปอง…</p>
+          <LoadingPanel message="กำลังรับคูปอง…" />
         )}
 
         {view.kind === 'claim_error' && (
@@ -253,4 +253,14 @@ async function fetchCouponView(code: string): Promise<ViewState> {
   }
 
   return { kind: 'ready_to_claim' };
+}
+
+function LoadingPanel({ message }: { message: string }) {
+  return (
+    <div className="rounded-2xl border border-cyan-100 bg-white/80 p-6 text-center shadow-sm">
+      <div className="mx-auto mb-3 h-8 w-8 rounded-full border-4 border-cyan-200 border-t-cyan-500 loading-ring" />
+      <p className="text-sm font-medium text-cyan-900">{message}</p>
+      <p className="mt-1 text-xs text-cyan-900/60">กรุณารอสักครู่…</p>
+    </div>
+  );
 }
