@@ -26,6 +26,7 @@ export default function ClaimPage() {
   const [view, setView] = useState<ViewState>({ kind: 'loading' });
   const [phone, setPhone] = useState('');
   const [confirmingClaim, setConfirmingClaim] = useState(false);
+  const [celebrate, setCelebrate] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -44,6 +45,28 @@ export default function ClaimPage() {
       cancelled = true;
     };
   }, [code]);
+
+  useEffect(() => {
+    if (view.kind !== 'claimed') return;
+
+    let cancelled = false;
+    const interval = window.setInterval(async () => {
+      const latestView = await fetchCouponView(code);
+
+      if (cancelled) return;
+
+      if (latestView.kind === 'redeemed') {
+        setCelebrate(true);
+        setView(latestView);
+        window.clearInterval(interval);
+      }
+    }, 2000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
+  }, [code, view.kind]);
 
   async function handleClaim() {
     const cleanPhone = phone.trim();
@@ -217,13 +240,32 @@ export default function ClaimPage() {
         )}
 
         {view.kind === 'redeemed' && (
-          <div className="bg-white/80 rounded-2xl p-6 text-center border border-cyan-100">
-            <p className="font-medium text-cyan-900/80">
-              คูปองนี้ถูกใช้ไปแล้ว ✅
+          <div className="relative overflow-hidden rounded-3xl border border-cyan-100 bg-white/80 p-6 text-center shadow-sm">
+            {celebrate && <CelebrationBurst />}
+            <p className="text-2xl font-bold text-cyan-900">🎉 สำเร็จ! 🎉</p>
+            <p className="mt-2 text-lg font-semibold text-cyan-700">
+              ใช้คูปองเรียบร้อยแล้ว
             </p>
-            <p className="text-cyan-900/60 text-sm mt-2">
-              ใช้เมื่อ {new Date(view.coupon.redeemed_at!).toLocaleDateString()}
+            <p className="mt-3 text-cyan-900/70 text-sm">
+              Enjoy ☕ ขอให้มีความสุขกับกาแฟแก้วฟรีของคุณ
             </p>
+            <div className="mt-4 rounded-2xl bg-cyan-50 p-4 text-left">
+              <p className="text-xs uppercase tracking-wide text-cyan-700 mb-1">
+                รหัสคูปอง
+              </p>
+              <p className="font-mono text-lg text-cyan-950">
+                {view.coupon.code}
+              </p>
+              <p className="text-cyan-900/60 text-xs mt-2">
+                ใช้เมื่อ {new Date(view.coupon.redeemed_at!).toLocaleString()}
+              </p>
+            </div>
+            <Link
+              href="/"
+              className="mt-4 inline-flex w-full items-center justify-center rounded-2xl bg-cyan-500 px-5 py-3 font-semibold text-white"
+            >
+              กลับหน้าแรก
+            </Link>
           </div>
         )}
       </div>
@@ -261,6 +303,26 @@ function LoadingPanel({ message }: { message: string }) {
       <div className="mx-auto mb-3 h-8 w-8 rounded-full border-4 border-cyan-200 border-t-cyan-500 loading-ring" />
       <p className="text-sm font-medium text-cyan-900">{message}</p>
       <p className="mt-1 text-xs text-cyan-900/60">กรุณารอสักครู่…</p>
+    </div>
+  );
+}
+
+function CelebrationBurst() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {Array.from({ length: 14 }).map((_, index) => (
+        <span
+          key={index}
+          className="absolute text-2xl opacity-90 animate-[confettiFloat_1.8s_ease-out_forwards]"
+          style={{
+            left: `${(index * 7) % 100}%`,
+            top: `${(index * 11) % 100}%`,
+            animationDelay: `${index * 90}ms`,
+          }}
+        >
+          {index % 4 === 0 ? '🎉' : index % 4 === 1 ? '✨' : index % 4 === 2 ? '💙' : '☕'}
+        </span>
+      ))}
     </div>
   );
 }
