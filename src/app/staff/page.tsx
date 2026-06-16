@@ -34,9 +34,11 @@ export default function StaffDashboardPage() {
   const [dashboardCounts, setDashboardCounts] = useState<{
     given: number | null;
     claimed: number | null;
+    redeemed: number | null;
   }>({
     given: null,
     claimed: null,
+    redeemed: null,
   });
   const [generationLoading, setGenerationLoading] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
@@ -63,12 +65,17 @@ export default function StaffDashboardPage() {
     const [
       { count: totalCount, error: totalError },
       { count: claimedCount, error: claimedError },
+      { count: redeemedCount, error: redeemedError },
     ] = await Promise.all([
       supabase.from('coupons').select('*', { count: 'exact', head: true }),
       supabase
         .from('coupons')
         .select('*', { count: 'exact', head: true })
         .eq('status', 'claimed'),
+      supabase
+        .from('coupons')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'redeemed'),
     ]);
 
     if (!cancelled && !totalError && totalCount !== null) {
@@ -83,6 +90,13 @@ export default function StaffDashboardPage() {
       setDashboardCounts((current) => ({
         ...current,
         claimed: claimedCount,
+      }));
+    }
+
+    if (!cancelled && !redeemedError && redeemedCount !== null) {
+      setDashboardCounts((current) => ({
+        ...current,
+        redeemed: redeemedCount,
       }));
     }
   }
@@ -311,10 +325,13 @@ export default function StaffDashboardPage() {
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl border border-cyan-100 bg-white/80 px-4 py-3 shadow-sm">
                   <p className="text-xs uppercase tracking-wide text-cyan-700">
-                    แจกแล้ว
+                    สร้างแล้ว
                   </p>
                   <p className="mt-1 text-2xl font-semibold">
                     {dashboardCounts.given === null ? '—' : dashboardCounts.given}
+                  </p>
+                  <p className="mt-1 text-xs text-cyan-900/60">
+                    คูปองทั้งหมดที่ถูกสร้างในระบบ
                   </p>
                 </div>
                 <div className="rounded-2xl border border-cyan-100 bg-white/80 px-4 py-3 shadow-sm">
@@ -326,8 +343,27 @@ export default function StaffDashboardPage() {
                       ? '—'
                       : dashboardCounts.claimed}
                   </p>
+                  <p className="mt-1 text-xs text-cyan-900/60">
+                    ลูกค้าสแกน QR และกรอกเบอร์โทรแล้ว
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-cyan-100 bg-white/80 px-4 py-3 shadow-sm sm:col-span-2">
+                  <p className="text-xs uppercase tracking-wide text-cyan-700">
+                    ใช้แล้ว
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold">
+                    {dashboardCounts.redeemed === null
+                      ? '—'
+                      : dashboardCounts.redeemed}
+                  </p>
+                  <p className="mt-1 text-xs text-cyan-900/60">
+                    พนักงานกดใช้คูปองแล้ว
+                  </p>
                 </div>
               </div>
+              <p className="text-xs leading-5 text-cyan-900/60">
+                ลำดับการใช้งานคือ สร้าง → ลูกค้ารับ → ใช้จริง
+              </p>
             </header>
 
             <section className="grid gap-4 md:grid-cols-2">
