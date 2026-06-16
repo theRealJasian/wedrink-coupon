@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { supabase, type Coupon } from '@/lib/supabase';
+import { formatPhoneNumber, normalizePhoneNumber } from '@/lib/phone';
 import BrandLogo from '@/components/BrandLogo';
 
 type LookupState =
@@ -16,9 +17,9 @@ export default function LookupPage() {
   const [state, setState] = useState<LookupState>({ kind: 'idle' });
 
   async function handleLookup() {
-    const cleanPhone = phone.trim();
+    const cleanPhone = normalizePhoneNumber(phone);
 
-    if (!cleanPhone) {
+    if (cleanPhone.length !== 10) {
       setState({
         kind: 'error',
         message: 'กรอกเบอร์โทรที่ใช้รับคูปองก่อนนะ 📱',
@@ -27,11 +28,14 @@ export default function LookupPage() {
     }
 
     setState({ kind: 'loading' });
+    const formattedPhone = formatPhoneNumber(cleanPhone);
 
     const { data, error } = await supabase
       .from('coupons')
       .select('*')
-      .eq('claimed_by_phone', cleanPhone)
+      .or(
+        `claimed_by_phone.eq.${formattedPhone},claimed_by_phone.eq.${cleanPhone}`
+      )
       .order('claimed_at', { ascending: false });
 
     if (error) {
@@ -64,8 +68,11 @@ export default function LookupPage() {
           </label>
           <input
             type="tel"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            autoComplete="tel-national"
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
+            onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
             placeholder="08X-XXX-XXXX"
             className="w-full rounded-xl border border-cyan-100 bg-cyan-50 px-4 py-3 text-sm outline-none focus:border-cyan-500"
           />

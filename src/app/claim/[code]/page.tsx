@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { QRCodeCanvas } from 'qrcode.react';
 import { supabase, type Coupon } from '@/lib/supabase';
+import { formatPhoneNumber, normalizePhoneNumber } from '@/lib/phone';
 import BrandLogo from '@/components/BrandLogo';
 import couponPreview from '../../../../wedrinkcoffeecoupon.png';
 
@@ -69,9 +70,9 @@ export default function ClaimPage() {
   }, [code, view.kind]);
 
   async function handleClaim() {
-    const cleanPhone = phone.trim();
+    const cleanPhone = normalizePhoneNumber(phone);
 
-    if (cleanPhone.length < 9) {
+    if (cleanPhone.length !== 10) {
       setView({
         kind: 'claim_error',
         message: 'กรุณากรอกเบอร์โทรให้ถูกต้อง 📱',
@@ -87,7 +88,7 @@ export default function ClaimPage() {
       .update({
         status: 'claimed',
         claimed_at: new Date().toISOString(),
-        claimed_by_phone: cleanPhone,
+        claimed_by_phone: formatPhoneNumber(cleanPhone),
       })
       .eq('code', code)
       .eq('status', 'unclaimed')
@@ -143,8 +144,11 @@ export default function ClaimPage() {
             </p>
             <input
               type="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="tel-national"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
               placeholder="08X-XXX-XXXX"
               className="w-full rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm outline-none focus:border-cyan-500 mb-3"
             />
@@ -190,8 +194,11 @@ export default function ClaimPage() {
             <p className="text-cyan-700 text-sm mb-4">{view.message}</p>
             <input
               type="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              autoComplete="tel-national"
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => setPhone(formatPhoneNumber(e.target.value))}
               placeholder="08X-XXX-XXXX"
               className="w-full rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm outline-none focus:border-cyan-500 mb-3"
             />
@@ -227,7 +234,7 @@ export default function ClaimPage() {
                 {view.coupon.code}
               </p>
               <p className="text-cyan-900/60 text-xs mt-2">
-                ผูกกับเบอร์ {view.coupon.claimed_by_phone} — โอนไม่ได้
+                ผูกกับเบอร์ {formatPhoneNumber(view.coupon.claimed_by_phone ?? '')} — โอนไม่ได้
               </p>
             </div>
             <Link

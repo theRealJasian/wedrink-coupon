@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { QRCodeSVG } from 'qrcode.react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { generateCouponCode } from '@/lib/codeGenerator';
+import { formatPhoneNumber, normalizePhoneNumber } from '@/lib/phone';
 import { supabase, type Coupon } from '@/lib/supabase';
 import BrandLogo from '@/components/BrandLogo';
 import couponPreview from '../../../wedrinkcoffeecoupon.png';
@@ -30,6 +31,13 @@ export default function StaffDashboardPage() {
   const [screen, setScreen] = useState<Screen>('home');
   const [busyMessage, setBusyMessage] = useState<string | null>(null);
   const [remaining, setRemaining] = useState<number | null>(null);
+  const [dashboardCounts, setDashboardCounts] = useState<{
+    given: number | null;
+    claimed: number | null;
+  }>({
+    given: null,
+    claimed: null,
+  });
   const [generationLoading, setGenerationLoading] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [generatedCoupon, setGeneratedCoupon] = useState<Coupon | null>(null);
@@ -51,17 +59,39 @@ export default function StaffDashboardPage() {
     null
   );
 
+  async function loadDashboardCounts(cancelled = false) {
+    const [
+      { count: totalCount, error: totalError },
+      { count: claimedCount, error: claimedError },
+    ] = await Promise.all([
+      supabase.from('coupons').select('*', { count: 'exact', head: true }),
+      supabase
+        .from('coupons')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'claimed'),
+    ]);
+
+    if (!cancelled && !totalError && totalCount !== null) {
+      setRemaining(100 - totalCount);
+      setDashboardCounts((current) => ({
+        ...current,
+        given: totalCount,
+      }));
+    }
+
+    if (!cancelled && !claimedError && claimedCount !== null) {
+      setDashboardCounts((current) => ({
+        ...current,
+        claimed: claimedCount,
+      }));
+    }
+  }
+
   useEffect(() => {
     let cancelled = false;
 
     void (async () => {
-      const { count, error } = await supabase
-        .from('coupons')
-        .select('*', { count: 'exact', head: true });
-
-      if (!cancelled && !error && count !== null) {
-        setRemaining(100 - count);
-      }
+      await loadDashboardCounts(cancelled);
     })();
 
     return () => {
@@ -70,13 +100,7 @@ export default function StaffDashboardPage() {
   }, []);
 
   async function refreshRemaining() {
-    const { count, error } = await supabase
-      .from('coupons')
-      .select('*', { count: 'exact', head: true });
-
-    if (!error && count !== null) {
-      setRemaining(100 - count);
-    }
+    await loadDashboardCounts();
   }
 
   async function generateCoupon() {
@@ -148,9 +172,9 @@ export default function StaffDashboardPage() {
   }
 
   async function lookupByPhone() {
-    const cleanPhone = phoneLookup.trim();
+    const cleanPhone = normalizePhoneNumber(phoneLookup);
 
-    if (!cleanPhone) {
+    if (cleanPhone.length !== 10) {
       setBusyMessage(null);
       setPhoneState({ kind: 'not_found' });
       setSelectedPhoneCoupon(null);
@@ -160,11 +184,14 @@ export default function StaffDashboardPage() {
     setPhoneState({ kind: 'loading' });
     setSelectedPhoneCoupon(null);
     setBusyMessage('กำลังค้นหาเบอร์โทร…');
+    const formattedPhone = formatPhoneNumber(cleanPhone);
 
     const { data, error } = await supabase
       .from('coupons')
       .select('*')
-      .eq('claimed_by_phone', cleanPhone)
+      .or(
+        `claimed_by_phone.eq.${formattedPhone},claimed_by_phone.eq.${cleanPhone}`
+      )
       .order('claimed_at', { ascending: false });
 
     if (error || !data || data.length === 0) {
@@ -280,6 +307,26 @@ export default function StaffDashboardPage() {
                 </span>
                 <span>{remaining === null ? '—' : remaining}</span>
                 <span>คูปอง 🎟️</span>
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-cyan-100 bg-white/80 px-4 py-3 shadow-sm">
+                  <p className="text-xs uppercase tracking-wide text-cyan-700">
+                    แจกแล้ว
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold">
+                    {dashboardCounts.given === null ? '—' : dashboardCounts.given}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-cyan-100 bg-white/80 px-4 py-3 shadow-sm">
+                  <p className="text-xs uppercase tracking-wide text-cyan-700">
+                    ลูกค้ารับแล้ว
+                  </p>
+                  <p className="mt-1 text-2xl font-semibold">
+                    {dashboardCounts.claimed === null
+                      ? '—'
+                      : dashboardCounts.claimed}
+                  </p>
+                </div>
               </div>
             </header>
 
@@ -500,10 +547,14 @@ export default function StaffDashboardPage() {
             onBack={() => setScreen('home')}
           >
             <div className="flex gap-2">
-              <input
-                value={phoneLookup}
-                onChange={(e) => setPhoneLookup(e.target.value)}
-                placeholder="08X-XXX-XXXX"
+                <input
+                  type="tel"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  autoComplete="tel-national"
+                  value={phoneLookup}
+                  onChange={(e) => setPhoneLookup(formatPhoneNumber(e.target.value))}
+                  placeholder="08X-XXX-XXXX"
                 className="flex-1 rounded-2xl border border-cyan-100 bg-white/80 px-4 py-3 text-sm outline-none focus:border-cyan-500"
               />
               <button
@@ -679,7 +730,7 @@ function CouponResult({
     <div className="rounded-3xl border border-cyan-100 bg-white/80 p-5 text-sm">
       <p className="mb-1 font-medium text-cyan-700">ใช้ได้ — พร้อมใช้ ✅</p>
       <p className="mb-3 text-cyan-900/60">
-        ผูกกับเบอร์: {coupon.claimed_by_phone}
+        ผูกกับเบอร์: {formatPhoneNumber(coupon.claimed_by_phone ?? '')}
       </p>
       <button
         onClick={() => onRedeem(coupon)}
