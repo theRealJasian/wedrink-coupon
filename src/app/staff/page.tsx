@@ -2,11 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { QRCodeSVG } from 'qrcode.react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { generateCouponCode } from '@/lib/codeGenerator';
 import { supabase, type Coupon } from '@/lib/supabase';
 import BrandLogo from '@/components/BrandLogo';
+import couponPreview from '../../../wedrinkcoffeecoupon.png';
 
 type Screen = 'home' | 'generate' | 'redeem' | 'lookup';
 
@@ -285,6 +287,23 @@ export default function StaffDashboardPage() {
                 เส้นทางรับคูปองของลูกค้า →
               </Link>
             </div>
+
+            <div className="overflow-hidden rounded-3xl border border-cyan-100 bg-white/80 shadow-sm">
+              <Image
+                src={couponPreview}
+                alt="ภาพตัวอย่างคูปอง WeDrink"
+                className="h-auto w-full object-cover"
+                priority
+              />
+              <div className="p-4">
+                <p className="text-sm font-medium text-cyan-950">
+                  ตัวอย่างคูปอง 🎟️
+                </p>
+                <p className="mt-1 text-sm text-cyan-900/60">
+                  ภาพนี้ช่วยให้พนักงานเห็นหน้าตาคูปองได้ชัดขึ้น
+                </p>
+              </div>
+            </div>
           </>
         )}
 
@@ -486,7 +505,7 @@ export default function StaffDashboardPage() {
                         onClick={() => markRedeemed(selectedPhoneCoupon)}
                         className="mt-4 w-full rounded-2xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
                       >
-                        ใช้คูปองให้ลูกค้า
+                        ใช้คูปอง
                       </button>
                     )}
                   </div>
@@ -568,7 +587,7 @@ function CouponResult({
         onClick={() => onRedeem(coupon)}
         className="w-full rounded-2xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
       >
-        ใช้คูปองให้ลูกค้า
+        ใช้คูปอง
       </button>
     </div>
   );

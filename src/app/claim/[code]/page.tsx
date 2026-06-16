@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useParams } from 'next/navigation';
 import { QRCodeCanvas } from 'qrcode.react';
 import { supabase, type Coupon } from '@/lib/supabase';
 import BrandLogo from '@/components/BrandLogo';
+import couponPreview from '../../../../wedrinkcoffeecoupon.png';
 
 type ViewState =
   | { kind: 'loading' }
@@ -82,6 +84,14 @@ export default function ClaimPage() {
       <div className="w-full max-w-sm">
         <div className="mb-4 flex justify-center">
           <BrandLogo />
+        </div>
+        <div className="mb-4 overflow-hidden rounded-2xl border border-cyan-100 bg-white shadow-sm">
+          <Image
+            src={couponPreview}
+            alt="ภาพคูปอง WeDrink"
+            className="h-auto w-full object-cover"
+            priority
+          />
         </div>
         <h1 className="text-xl font-semibold text-center mb-1">
           WeDrink U-Thong ☕✨
