@@ -7,7 +7,7 @@ export default function BrandLogo() {
       src={logo}
       alt="โลโก้ WeDrink"
       priority
-      className="h-auto w-24"
+      className="h-auto w-20 sm:w-24"
     />
   );
 }

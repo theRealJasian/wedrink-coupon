@@ -217,7 +217,7 @@ export default function StaffDashboardPage() {
     : null;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.16),_transparent_40%),linear-gradient(180deg,_#f7feff_0%,_#ecfeff_100%)] p-6 text-cyan-950">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.16),_transparent_40%),linear-gradient(180deg,_#f7feff_0%,_#ecfeff_100%)] px-4 py-5 sm:p-6 text-cyan-950">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
         {screen === 'home' && (
           <>
@@ -230,17 +230,24 @@ export default function StaffDashboardPage() {
               <p className="mt-2 max-w-2xl text-sm text-cyan-900/60">
                 เลือกสิ่งที่ต้องการทำ สร้างคูปอง ใช้คูปอง หรือค้นหาตามเบอร์โทร
               </p>
+              <div className="mt-4 inline-flex items-center gap-3 rounded-full border border-cyan-100 bg-white/80 px-4 py-2 text-sm font-medium text-cyan-900 shadow-sm">
+                <span className="rounded-full bg-cyan-500 px-2 py-1 text-xs font-semibold text-white">
+                  เหลือ
+                </span>
+                <span>{remaining === null ? '—' : remaining}</span>
+                <span>คูปอง 🎟️</span>
+              </div>
             </header>
 
-            <section className="grid gap-4 md:grid-cols-3">
+            <section className="grid gap-4 md:grid-cols-2">
               <button
                 onClick={() => setScreen('generate')}
-                className="rounded-3xl border border-cyan-100 bg-white/80 p-6 text-left transition hover:-translate-y-0.5 hover:border-cyan-300"
+                className="min-h-44 rounded-3xl border border-cyan-100 bg-white/80 p-6 text-left transition hover:-translate-y-0.5 hover:border-cyan-300 md:col-span-1 sm:min-h-48 sm:p-7"
               >
                 <p className="text-xs uppercase tracking-wide text-cyan-700">
                   ตัวเลือก 1
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">สร้างคูปอง 🎟️</h2>
+                <h2 className="mt-3 text-3xl font-semibold">สร้าง QR คูปอง 🎟️</h2>
                 <p className="mt-2 text-sm text-cyan-900/60">
                   สร้างคูปองใหม่และแสดง QR ให้ลูกค้า
                 </p>
@@ -248,12 +255,12 @@ export default function StaffDashboardPage() {
 
               <button
                 onClick={() => setScreen('redeem')}
-                className="rounded-3xl border border-cyan-100 bg-white/80 p-6 text-left transition hover:-translate-y-0.5 hover:border-cyan-300"
+                className="min-h-44 rounded-3xl border border-cyan-100 bg-white/80 p-6 text-left transition hover:-translate-y-0.5 hover:border-cyan-300 md:col-span-1 sm:min-h-48 sm:p-7"
               >
                 <p className="text-xs uppercase tracking-wide text-cyan-700">
                   ตัวเลือก 2
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">ใช้คูปอง ✅</h2>
+                <h2 className="mt-3 text-3xl font-semibold">สแกน QR ลูกค้า 📲</h2>
                 <p className="mt-2 text-sm text-cyan-900/60">
                   สแกน QR ของลูกค้าหรือกรอกรหัสคูปอง
                 </p>
@@ -261,12 +268,12 @@ export default function StaffDashboardPage() {
 
               <button
                 onClick={() => setScreen('lookup')}
-                className="rounded-3xl border border-cyan-100 bg-white/80 p-6 text-left transition hover:-translate-y-0.5 hover:border-cyan-300"
+                className="rounded-3xl border border-cyan-100 bg-white/80 p-5 text-left transition hover:-translate-y-0.5 hover:border-cyan-300 md:col-span-2"
               >
                 <p className="text-xs uppercase tracking-wide text-cyan-700">
                   ตัวเลือก 3
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">ค้นหาคูปอง 🔎</h2>
+                <h2 className="mt-2 text-xl font-semibold">ค้นหาคูปอง 🔎</h2>
                 <p className="mt-2 text-sm text-cyan-900/60">
                   ค้นหาจากเบอร์โทร แล้วดึง QR ของลูกค้าออกมา
                 </p>
@@ -276,13 +283,13 @@ export default function StaffDashboardPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <Link
                 href="/lookup"
-                className="rounded-2xl border border-cyan-100 bg-white/80 px-5 py-4 text-sm text-cyan-900/70 transition hover:border-cyan-300"
+                className="rounded-2xl border border-cyan-100 bg-white/80 px-5 py-4 text-sm text-cyan-900/70 transition hover:border-cyan-300 active:scale-[0.99]"
               >
                 หน้าลูกค้าค้นหาคูปอง →
               </Link>
               <Link
                 href="/claim"
-                className="rounded-2xl border border-cyan-100 bg-white/80 px-5 py-4 text-sm text-cyan-900/70 transition hover:border-cyan-300"
+                className="rounded-2xl border border-cyan-100 bg-white/80 px-5 py-4 text-sm text-cyan-900/70 transition hover:border-cyan-300 active:scale-[0.99]"
               >
                 เส้นทางรับคูปองของลูกค้า →
               </Link>
@@ -344,17 +351,25 @@ export default function StaffDashboardPage() {
                   ให้ลูกค้าสแกน QR นี้ 📲
                 </p>
                 <div className="mt-4 flex justify-center">
-                  <QRCodeSVG value={generatedClaimUrl} size={240} />
+                  <QRCodeSVG value={generatedClaimUrl} size={200} />
                 </div>
                 <p className="mt-3 text-xs text-cyan-900/60">
                   {generatedCoupon.code}
                 </p>
-                <button
-                  onClick={() => setGeneratedCoupon(null)}
-                  className="mt-4 w-full rounded-xl bg-cyan-950 py-3 font-medium text-white"
-                >
-                  เสร็จแล้ว
-                </button>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <button
+                    onClick={() => setGeneratedCoupon(null)}
+                    className="w-full rounded-xl bg-cyan-950 py-3 font-medium text-white"
+                  >
+                    เสร็จแล้ว
+                  </button>
+                  <button
+                    onClick={() => setScreen('home')}
+                    className="w-full rounded-xl border border-cyan-200 bg-white py-3 font-semibold text-cyan-950"
+                  >
+                    กลับหน้าหลัก
+                  </button>
+                </div>
               </div>
             )}
           </ActionFrame>
@@ -412,7 +427,11 @@ export default function StaffDashboardPage() {
             )}
 
             {couponState.kind === 'found' && (
-              <CouponResult coupon={couponState.coupon} onRedeem={markRedeemed} />
+              <CouponResult
+                coupon={couponState.coupon}
+                onRedeem={markRedeemed}
+                onHome={() => setScreen('home')}
+              />
             )}
           </ActionFrame>
         )}
@@ -500,14 +519,22 @@ export default function StaffDashboardPage() {
                     <p className="mt-3 text-center text-xs text-cyan-900/60">
                       {selectedPhoneCoupon.code}
                     </p>
-                    {selectedPhoneCoupon.status === 'claimed' && (
+                    <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                      {selectedPhoneCoupon.status === 'claimed' && (
+                        <button
+                          onClick={() => markRedeemed(selectedPhoneCoupon)}
+                          className="w-full rounded-2xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
+                        >
+                          ใช้คูปอง
+                        </button>
+                      )}
                       <button
-                        onClick={() => markRedeemed(selectedPhoneCoupon)}
-                        className="mt-4 w-full rounded-2xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
+                        onClick={() => setScreen('home')}
+                        className="w-full rounded-2xl border border-cyan-200 bg-white py-3 font-semibold text-cyan-950"
                       >
-                        ใช้คูปอง
+                        กลับหน้าหลัก
                       </button>
-                    )}
+                    </div>
                   </div>
                 )}
               </div>
@@ -535,7 +562,7 @@ function ActionFrame({
       <header className="pt-4">
         <button
           onClick={onBack}
-          className="text-sm text-cyan-700 underline underline-offset-4"
+          className="inline-flex items-center gap-2 rounded-full bg-cyan-500 px-5 py-3 text-base font-semibold text-white shadow-md shadow-cyan-200 transition hover:bg-cyan-400"
         >
           ← กลับหน้าหลัก
         </button>
@@ -551,9 +578,11 @@ function ActionFrame({
 function CouponResult({
   coupon,
   onRedeem,
+  onHome,
 }: {
   coupon: Coupon;
   onRedeem: (c: Coupon) => void;
+  onHome: () => void;
 }) {
   if (coupon.status === 'unclaimed') {
     return (
@@ -588,6 +617,12 @@ function CouponResult({
         className="w-full rounded-2xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
       >
         ใช้คูปอง
+      </button>
+      <button
+        onClick={onHome}
+        className="mt-3 w-full rounded-2xl border border-cyan-200 bg-white py-3 font-semibold text-cyan-950"
+      >
+        กลับหน้าหลัก
       </button>
     </div>
   );

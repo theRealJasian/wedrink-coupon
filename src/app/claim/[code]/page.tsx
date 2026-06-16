@@ -80,7 +80,7 @@ export default function ClaimPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 text-cyan-950">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-6 sm:p-6 text-cyan-950">
       <div className="w-full max-w-sm">
         <div className="mb-4 flex justify-center">
           <BrandLogo />
@@ -114,7 +114,7 @@ export default function ClaimPage() {
         )}
 
         {view.kind === 'ready_to_claim' && (
-          <div className="bg-white/80 rounded-2xl p-6 border border-cyan-100 shadow-sm">
+          <div className="bg-white/80 rounded-2xl p-5 sm:p-6 border border-cyan-100 shadow-sm">
             <p className="text-sm text-cyan-900/70 mb-4">
               ใส่เบอร์โทรเพื่อรับคูปองเครื่องดื่มฟรี คูปองนี้ใช้ได้เฉพาะคุณ
             </p>
@@ -189,7 +189,7 @@ export default function ClaimPage() {
             <p className="text-cyan-900/70 text-sm mb-4">
               แสดง QR นี้ให้พนักงานตอนต้องการใช้สิทธิ์
             </p>
-            <div className="bg-white rounded-2xl p-5 flex min-h-[260px] items-center justify-center border border-cyan-100">
+            <div className="bg-white rounded-2xl p-4 sm:p-5 flex min-h-[220px] sm:min-h-[260px] items-center justify-center border border-cyan-100">
               <QRCodeCanvas
                 value={view.coupon.code}
                 size={220}

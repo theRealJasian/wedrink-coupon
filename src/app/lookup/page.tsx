@@ -46,7 +46,7 @@ export default function LookupPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 text-cyan-950">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-6 sm:p-6 text-cyan-950">
       <div className="w-full max-w-sm">
         <div className="mb-4 flex justify-center">
           <BrandLogo />
@@ -58,7 +58,7 @@ export default function LookupPage() {
           ใส่เบอร์โทรที่เคยใช้รับคูปอง
         </p>
 
-        <div className="bg-white/80 rounded-2xl p-6 mb-4 border border-cyan-100">
+        <div className="bg-white/80 rounded-2xl p-5 sm:p-6 mb-4 border border-cyan-100">
           <label className="block text-xs uppercase tracking-wide text-cyan-700 mb-2">
             เบอร์โทร 📱
           </label>
@@ -102,7 +102,7 @@ export default function LookupPage() {
                   <Link
                     key={coupon.id}
                     href={`/claim/${coupon.code}`}
-                    className="block bg-white/80 rounded-2xl p-5 border border-cyan-100 hover:border-cyan-300 transition"
+                    className="block bg-white/80 rounded-2xl p-5 border border-cyan-100 hover:border-cyan-300 transition active:scale-[0.99]"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div>

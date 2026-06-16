@@ -16,7 +16,7 @@ export default function RootLayout({
     <html lang="th" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <div className="border-b border-cyan-200/70 bg-white/70 backdrop-blur">
-          <div className="mx-auto flex max-w-6xl items-center justify-center px-6 py-3">
+          <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-2 sm:px-6 sm:py-3">
             <BrandLogo />
           </div>
         </div>
