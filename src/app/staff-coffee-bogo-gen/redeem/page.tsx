@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { supabase, type Coupon } from '@/lib/supabase';
 
@@ -10,10 +11,23 @@ type LookupState =
   | { kind: 'not_found' }
   | { kind: 'found'; coupon: Coupon };
 
+type PhoneLookupState =
+  | { kind: 'idle' }
+  | { kind: 'loading' }
+  | { kind: 'not_found' }
+  | { kind: 'found'; coupons: Coupon[] };
+
 export default function RedeemPage() {
   const [manualCode, setManualCode] = useState('');
   const [state, setState] = useState<LookupState>({ kind: 'idle' });
   const [scanning, setScanning] = useState(false);
+  const [phoneLookup, setPhoneLookup] = useState('');
+  const [phoneState, setPhoneState] = useState<PhoneLookupState>({
+    kind: 'idle',
+  });
+  const [selectedPhoneCoupon, setSelectedPhoneCoupon] = useState<Coupon | null>(
+    null
+  );
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
   function extractCode(input: string): string {
@@ -55,6 +69,33 @@ export default function RedeemPage() {
     if (!error && data) {
       setState({ kind: 'found', coupon: data as Coupon });
     }
+  }
+
+  async function lookupByPhone() {
+    const cleanPhone = phoneLookup.trim();
+
+    if (!cleanPhone) {
+      setPhoneState({ kind: 'not_found' });
+      return;
+    }
+
+    setPhoneState({ kind: 'loading' });
+    setSelectedPhoneCoupon(null);
+
+    const { data, error } = await supabase
+      .from('coupons')
+      .select('*')
+      .eq('claimed_by_phone', cleanPhone)
+      .order('claimed_at', { ascending: false });
+
+    if (error || !data || data.length === 0) {
+      setPhoneState({ kind: 'not_found' });
+      return;
+    }
+
+    const coupons = data as Coupon[];
+    setPhoneState({ kind: 'found', coupons });
+    setSelectedPhoneCoupon(coupons[0]);
   }
 
   async function startScan() {
@@ -132,6 +173,103 @@ export default function RedeemPage() {
             Check
           </button>
         </div>
+
+        <div className="bg-neutral-900 rounded-2xl p-4 mb-4">
+          <p className="text-xs uppercase tracking-wide text-neutral-500 mb-2">
+            Look up by phone
+          </p>
+          <div className="flex gap-2">
+            <input
+              value={phoneLookup}
+              onChange={(e) => setPhoneLookup(e.target.value)}
+              placeholder="08X-XXX-XXXX"
+              className="flex-1 bg-neutral-800 rounded-xl px-4 py-2.5 text-sm outline-none border border-neutral-700 focus:border-amber-500"
+            />
+            <button
+              onClick={lookupByPhone}
+              className="bg-amber-500 text-neutral-950 font-medium px-4 rounded-xl text-sm"
+            >
+              Search
+            </button>
+          </div>
+        </div>
+
+        {phoneState.kind === 'loading' && (
+          <p className="text-center text-neutral-400 text-sm mb-4">
+            Searching phone number…
+          </p>
+        )}
+
+        {phoneState.kind === 'not_found' && (
+          <p className="text-center text-red-400 text-sm mb-4">
+            No claimed coupons found for that phone number.
+          </p>
+        )}
+
+        {phoneState.kind === 'found' && (
+          <div className="space-y-3 mb-4">
+            {phoneState.coupons.map((coupon) => {
+              const isSelected = selectedPhoneCoupon?.id === coupon.id;
+              const isRedeemed = coupon.status === 'redeemed';
+
+              return (
+                <button
+                  key={coupon.id}
+                  onClick={() => setSelectedPhoneCoupon(coupon)}
+                  className={`w-full rounded-2xl p-4 text-left border transition ${
+                    isSelected
+                      ? 'border-amber-500 bg-amber-500/10'
+                      : 'border-neutral-800 bg-neutral-900 hover:border-neutral-700'
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-sm text-neutral-500 mb-1">
+                        {isRedeemed ? 'Already used' : 'Valid — tap to view'}
+                      </p>
+                      <p className="text-base font-semibold text-neutral-100">
+                        {coupon.code}
+                      </p>
+                    </div>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        isRedeemed
+                          ? 'bg-red-500/15 text-red-300'
+                          : 'bg-amber-500/15 text-amber-300'
+                      }`}
+                    >
+                      {coupon.status}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {selectedPhoneCoupon && (
+          <div className="bg-neutral-900 rounded-2xl p-5 mb-4">
+            <p className="text-sm text-neutral-300 mb-4">
+              {selectedPhoneCoupon.status === 'redeemed'
+                ? 'Already redeemed'
+                : 'QR for staff to scan'}
+            </p>
+            <div className="bg-white rounded-2xl p-4 flex justify-center">
+              <QRCodeSVG value={selectedPhoneCoupon.code} size={176} />
+            </div>
+            <p className="mt-3 text-neutral-500 text-xs text-center">
+              {selectedPhoneCoupon.code}
+            </p>
+            {selectedPhoneCoupon.status === 'claimed' && (
+              <button
+                onClick={() => markRedeemed(selectedPhoneCoupon)}
+                className="mt-4 w-full bg-green-500 hover:bg-green-400 text-neutral-950 font-semibold py-2.5 rounded-xl"
+              >
+                Mark as Redeemed
+              </button>
+            )}
+          </div>
+        )}
 
         <a
           href="/lookup"
