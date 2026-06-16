@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { QRCodeSVG } from 'qrcode.react';
 import { supabase, type Coupon } from '@/lib/supabase';
 
 type ViewState =
@@ -21,6 +22,7 @@ export default function ClaimPage() {
 
   const [view, setView] = useState<ViewState>({ kind: 'loading' });
   const [phone, setPhone] = useState('');
+  const [confirmingClaim, setConfirmingClaim] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -52,6 +54,7 @@ export default function ClaimPage() {
     }
 
     setView({ kind: 'claiming' });
+    setConfirmingClaim(false);
 
     // Atomic claim: only succeeds if still unclaimed.
     // This prevents two people from claiming the same code at once,
@@ -114,11 +117,36 @@ export default function ClaimPage() {
               className="w-full bg-neutral-800 rounded-xl px-4 py-3 text-sm outline-none border border-neutral-700 focus:border-amber-500 mb-3"
             />
             <button
-              onClick={handleClaim}
+              onClick={() => setConfirmingClaim(true)}
               className="w-full bg-amber-500 hover:bg-amber-400 text-neutral-950 font-semibold py-3 rounded-xl"
             >
               Claim My Coupon
             </button>
+            {confirmingClaim && (
+              <div className="mt-3 rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-left">
+                <p className="text-amber-300 text-sm font-medium mb-2">
+                  Final step
+                </p>
+                <p className="text-neutral-300 text-sm">
+                  If you claim this coupon, it will be linked to your phone
+                  number and cannot be transferred to someone else.
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={() => setConfirmingClaim(false)}
+                    className="flex-1 rounded-xl border border-neutral-700 bg-neutral-900 py-2.5 text-sm text-neutral-300"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleClaim}
+                    className="flex-1 rounded-xl bg-amber-500 py-2.5 text-sm font-semibold text-neutral-950"
+                  >
+                    Yes, claim it
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -153,10 +181,8 @@ export default function ClaimPage() {
             <p className="text-neutral-400 text-sm mb-4">
               Show this screen to staff next time to redeem your free drink.
             </p>
-            <div className="bg-white rounded-xl py-4">
-              <p className="text-neutral-900 font-mono text-lg">
-                {view.coupon.code}
-              </p>
+            <div className="bg-white rounded-2xl p-4 flex justify-center">
+              <QRCodeSVG value={view.coupon.code} size={176} />
             </div>
             <p className="text-neutral-500 text-xs mt-3">
               Linked to {view.coupon.claimed_by_phone} — non-transferable
