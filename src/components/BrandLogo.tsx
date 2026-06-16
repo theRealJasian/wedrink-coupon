@@ -5,7 +5,7 @@ export default function BrandLogo() {
   return (
     <Image
       src={logo}
-      alt="WeDrink logo"
+      alt="โลโก้ WeDrink"
       priority
       className="h-auto w-24"
     />

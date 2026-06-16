@@ -21,7 +21,7 @@ export default function LookupPage() {
     if (!cleanPhone) {
       setState({
         kind: 'error',
-        message: 'Enter the phone number you used to claim the coupon.',
+        message: 'กรอกเบอร์โทรที่ใช้รับคูปองก่อนนะ 📱',
       });
       return;
     }
@@ -37,7 +37,7 @@ export default function LookupPage() {
     if (error) {
       setState({
         kind: 'error',
-        message: 'Something went wrong while looking up your coupons.',
+        message: 'เกิดข้อผิดพลาดระหว่างค้นหาคูปอง 😅',
       });
       return;
     }
@@ -52,15 +52,15 @@ export default function LookupPage() {
           <BrandLogo />
         </div>
         <h1 className="text-xl font-semibold text-center mb-1">
-          Find My Coupon
+          ค้นหาคูปองของฉัน 🔎
         </h1>
         <p className="text-center text-cyan-600 text-sm mb-8">
-          Enter the phone number you used to claim it
+          ใส่เบอร์โทรที่เคยใช้รับคูปอง
         </p>
 
         <div className="bg-white/80 rounded-2xl p-6 mb-4 border border-cyan-100">
           <label className="block text-xs uppercase tracking-wide text-cyan-700 mb-2">
-            Phone number
+            เบอร์โทร 📱
           </label>
           <input
             type="tel"
@@ -73,12 +73,12 @@ export default function LookupPage() {
             onClick={handleLookup}
             className="w-full mt-3 bg-cyan-500 hover:bg-cyan-400 text-white font-semibold py-3 rounded-xl"
           >
-            Find My Coupon
+            ค้นหาคูปอง 🔎
           </button>
         </div>
 
         {state.kind === 'loading' && (
-          <p className="text-center text-cyan-900/60 text-sm">Looking up…</p>
+          <p className="text-center text-cyan-900/60 text-sm">กำลังค้นหา…</p>
         )}
 
         {state.kind === 'error' && (
@@ -89,10 +89,9 @@ export default function LookupPage() {
           <div className="space-y-3">
             {state.coupons.length === 0 ? (
               <div className="bg-white/80 rounded-2xl p-6 text-center border border-cyan-100">
-                <p className="text-cyan-900 font-medium">No coupons found</p>
+                <p className="text-cyan-900 font-medium">ไม่พบคูปอง 😢</p>
                 <p className="text-cyan-900/60 text-sm mt-2">
-                  We couldn&apos;t find any claimed coupons for that phone
-                  number.
+                  ไม่เจอคูปองที่ผูกกับเบอร์นี้
                 </p>
               </div>
             ) : (
@@ -108,7 +107,7 @@ export default function LookupPage() {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="text-sm text-cyan-700 mb-1">
-                          {isRedeemed ? 'Already used' : 'Valid — tap to view'}
+                          {isRedeemed ? 'ใช้แล้ว ✅' : 'ใช้ได้ — แตะเพื่อดู 👆'}
                         </p>
                         <p className="text-lg font-semibold text-cyan-950">
                           {coupon.code}
@@ -125,10 +124,10 @@ export default function LookupPage() {
                       </span>
                     </div>
                     <p className="mt-3 text-xs text-cyan-900/60">
-                      Claimed{' '}
+                      รับคูปองเมื่อ{' '}
                       {coupon.claimed_at
                         ? new Date(coupon.claimed_at).toLocaleString()
-                        : 'recently'}
+                        : 'เมื่อสักครู่'}
                     </p>
                   </Link>
                 );

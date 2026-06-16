@@ -26,17 +26,14 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
 export default function StaffDashboardPage() {
   const [screen, setScreen] = useState<Screen>('home');
-
   const [remaining, setRemaining] = useState<number | null>(null);
   const [generationLoading, setGenerationLoading] = useState(false);
   const [generationError, setGenerationError] = useState<string | null>(null);
   const [generatedCoupon, setGeneratedCoupon] = useState<Coupon | null>(null);
-
   const [manualCode, setManualCode] = useState('');
   const [couponState, setCouponState] = useState<CouponLookupState>({
     kind: 'idle',
   });
-
   const [phoneLookup, setPhoneLookup] = useState('');
   const [phoneState, setPhoneState] = useState<PhoneLookupState>({
     kind: 'idle',
@@ -44,7 +41,6 @@ export default function StaffDashboardPage() {
   const [selectedPhoneCoupon, setSelectedPhoneCoupon] = useState<Coupon | null>(
     null
   );
-
   const [scanning, setScanning] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
 
@@ -92,8 +88,8 @@ export default function StaffDashboardPage() {
     if (error) {
       setGenerationError(
         error.message.includes('limit')
-          ? 'All 100 coupons have been given out.'
-          : 'Something went wrong generating the coupon.'
+          ? 'คูปองครบ 100 ใบแล้ว 🎉'
+          : 'เกิดข้อผิดพลาดตอนสร้างคูปอง 😅'
       );
       setGenerationLoading(false);
       return;
@@ -219,19 +215,18 @@ export default function StaffDashboardPage() {
     : null;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.16),_transparent_40%),linear-gradient(180deg,_#f7feff_0%,_#ecfeff_100%)] text-cyan-950 p-6">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(34,211,238,0.16),_transparent_40%),linear-gradient(180deg,_#f7feff_0%,_#ecfeff_100%)] p-6 text-cyan-950">
       <div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
         {screen === 'home' && (
           <>
             <header className="pt-4">
               <BrandLogo />
-              <p className="text-xs uppercase tracking-[0.3em] text-neutral-500">
-                WeDrink U-Thong
+              <p className="text-xs uppercase tracking-[0.3em] text-cyan-700">
+                WeDrink U-Thong ☕✨
               </p>
-              <h1 className="mt-2 text-3xl font-semibold">Staff Dashboard</h1>
+              <h1 className="mt-2 text-3xl font-semibold">แดชบอร์ดพนักงาน 🧑‍💼</h1>
               <p className="mt-2 max-w-2xl text-sm text-cyan-900/60">
-                Pick what you want to do. Generate a coupon, redeem one, or
-                look up a phone number.
+                เลือกสิ่งที่ต้องการทำ สร้างคูปอง ใช้คูปอง หรือค้นหาตามเบอร์โทร
               </p>
             </header>
 
@@ -241,11 +236,11 @@ export default function StaffDashboardPage() {
                 className="rounded-3xl border border-cyan-100 bg-white/80 p-6 text-left transition hover:-translate-y-0.5 hover:border-cyan-300"
               >
                 <p className="text-xs uppercase tracking-wide text-cyan-700">
-                  Action 1
+                  ตัวเลือก 1
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">Generate</h2>
+                <h2 className="mt-2 text-2xl font-semibold">สร้างคูปอง 🎟️</h2>
                 <p className="mt-2 text-sm text-cyan-900/60">
-                  Make a new coupon and show the customer QR.
+                  สร้างคูปองใหม่และแสดง QR ให้ลูกค้า
                 </p>
               </button>
 
@@ -254,11 +249,11 @@ export default function StaffDashboardPage() {
                 className="rounded-3xl border border-cyan-100 bg-white/80 p-6 text-left transition hover:-translate-y-0.5 hover:border-cyan-300"
               >
                 <p className="text-xs uppercase tracking-wide text-cyan-700">
-                  Action 2
+                  ตัวเลือก 2
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">Redeem</h2>
+                <h2 className="mt-2 text-2xl font-semibold">ใช้คูปอง ✅</h2>
                 <p className="mt-2 text-sm text-cyan-900/60">
-                  Scan a customer QR or enter a coupon code.
+                  สแกน QR ของลูกค้าหรือกรอกรหัสคูปอง
                 </p>
               </button>
 
@@ -267,11 +262,11 @@ export default function StaffDashboardPage() {
                 className="rounded-3xl border border-cyan-100 bg-white/80 p-6 text-left transition hover:-translate-y-0.5 hover:border-cyan-300"
               >
                 <p className="text-xs uppercase tracking-wide text-cyan-700">
-                  Action 3
+                  ตัวเลือก 3
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">Lookup</h2>
+                <h2 className="mt-2 text-2xl font-semibold">ค้นหาคูปอง 🔎</h2>
                 <p className="mt-2 text-sm text-cyan-900/60">
-                  Search by phone number and pull up the customer&apos;s QR.
+                  ค้นหาจากเบอร์โทร แล้วดึง QR ของลูกค้าออกมา
                 </p>
               </button>
             </section>
@@ -281,13 +276,13 @@ export default function StaffDashboardPage() {
                 href="/lookup"
                 className="rounded-2xl border border-cyan-100 bg-white/80 px-5 py-4 text-sm text-cyan-900/70 transition hover:border-cyan-300"
               >
-                Customer lookup page →
+                หน้าลูกค้าค้นหาคูปอง →
               </Link>
               <Link
                 href="/claim"
                 className="rounded-2xl border border-cyan-100 bg-white/80 px-5 py-4 text-sm text-cyan-900/70 transition hover:border-cyan-300"
               >
-                Claim route for customers →
+                เส้นทางรับคูปองของลูกค้า →
               </Link>
             </div>
           </>
@@ -295,13 +290,13 @@ export default function StaffDashboardPage() {
 
         {screen === 'generate' && (
           <ActionFrame
-            title="Generate coupon"
-              subtitle="Create a new coupon and show the customer QR."
-              onBack={() => setScreen('home')}
-            >
+            title="สร้างคูปอง 🎟️"
+            subtitle="สร้างคูปองใหม่และแสดง QR ให้ลูกค้า"
+            onBack={() => setScreen('home')}
+          >
             <div className="rounded-2xl border border-cyan-100 bg-white/80 p-5 text-center">
               <p className="text-xs uppercase tracking-wide text-cyan-700">
-                Coupons Remaining
+                คูปองที่เหลือ
               </p>
               <p className="mt-2 text-4xl font-bold">
                 {remaining === null ? '—' : remaining}
@@ -314,10 +309,10 @@ export default function StaffDashboardPage() {
               className="w-full rounded-2xl bg-cyan-500 py-4 text-lg font-semibold text-white disabled:bg-cyan-200 disabled:text-cyan-900/50"
             >
               {generationLoading
-                ? 'Generating…'
+                ? 'กำลังสร้าง…'
                 : remaining === 0
-                ? 'No coupons left'
-                : 'Generate coupon'}
+                ? 'คูปองหมดแล้ว'
+                : 'สร้างคูปอง'}
             </button>
 
             {generationError && (
@@ -325,21 +320,21 @@ export default function StaffDashboardPage() {
             )}
 
             {generatedCoupon && generatedClaimUrl && (
-              <div className="rounded-3xl bg-white p-5 text-center border border-cyan-100">
+              <div className="rounded-3xl border border-cyan-100 bg-white p-5 text-center">
                 <p className="text-sm font-medium text-cyan-950">
-                  Customer scans this QR
+                  ให้ลูกค้าสแกน QR นี้ 📲
                 </p>
                 <div className="mt-4 flex justify-center">
                   <QRCodeSVG value={generatedClaimUrl} size={240} />
                 </div>
-                <p className="mt-3 text-xs text-neutral-500">
+                <p className="mt-3 text-xs text-cyan-900/60">
                   {generatedCoupon.code}
                 </p>
                 <button
                   onClick={() => setGeneratedCoupon(null)}
                   className="mt-4 w-full rounded-xl bg-cyan-950 py-3 font-medium text-white"
                 >
-                  Done
+                  เสร็จแล้ว
                 </button>
               </div>
             )}
@@ -348,8 +343,8 @@ export default function StaffDashboardPage() {
 
         {screen === 'redeem' && (
           <ActionFrame
-            title="Redeem coupon"
-            subtitle="Scan the customer QR or type their code."
+            title="ใช้คูปอง ✅"
+            subtitle="สแกน QR ของลูกค้าหรือกรอกรหัส"
             onBack={() => setScreen('home')}
           >
             <button
@@ -357,7 +352,7 @@ export default function StaffDashboardPage() {
               disabled={scanning}
               className="w-full rounded-2xl bg-cyan-950 py-4 text-lg font-semibold text-white transition hover:bg-cyan-900 disabled:opacity-60"
             >
-              {scanning ? 'Scanning…' : 'Scan customer QR'}
+              {scanning ? 'กำลังสแกน…' : 'สแกน QR ลูกค้า'}
             </button>
 
             {scanning && (
@@ -367,7 +362,7 @@ export default function StaffDashboardPage() {
                   onClick={stopScan}
                   className="mt-3 w-full rounded-xl bg-cyan-100 py-3 text-sm text-cyan-950"
                 >
-                  Cancel scan
+                  ยกเลิกการสแกน
                 </button>
               </div>
             )}
@@ -383,17 +378,17 @@ export default function StaffDashboardPage() {
                 onClick={() => lookupCouponByCode(manualCode)}
                 className="rounded-2xl bg-cyan-500 px-5 font-semibold text-white"
               >
-                Check
+                ตรวจสอบ
               </button>
             </div>
 
             {couponState.kind === 'loading' && (
-              <p className="text-sm text-cyan-900/60">Checking…</p>
+              <p className="text-sm text-cyan-900/60">กำลังตรวจสอบ…</p>
             )}
 
             {couponState.kind === 'not_found' && (
               <p className="text-sm text-cyan-700">
-                Coupon not found. Double-check the code.
+                ไม่พบคูปอง ตรวจสอบรหัสอีกครั้ง
               </p>
             )}
 
@@ -405,8 +400,8 @@ export default function StaffDashboardPage() {
 
         {screen === 'lookup' && (
           <ActionFrame
-            title="Lookup by phone"
-            subtitle="Search the customer&apos;s phone number, then open their coupon."
+            title="ค้นหาคูปอง 🔎"
+            subtitle="ค้นหาจากเบอร์โทร แล้วเปิดคูปองของลูกค้า"
             onBack={() => setScreen('home')}
           >
             <div className="flex gap-2">
@@ -420,17 +415,17 @@ export default function StaffDashboardPage() {
                 onClick={lookupByPhone}
                 className="rounded-2xl bg-cyan-500 px-5 font-semibold text-white"
               >
-                Search
+                ค้นหา
               </button>
             </div>
 
             {phoneState.kind === 'loading' && (
-              <p className="text-sm text-cyan-900/60">Searching…</p>
+              <p className="text-sm text-cyan-900/60">กำลังค้นหา…</p>
             )}
 
             {phoneState.kind === 'not_found' && (
               <p className="text-sm text-cyan-700">
-                No claimed coupons found for that phone number.
+                ไม่พบคูปองที่รับไว้สำหรับเบอร์นี้
               </p>
             )}
 
@@ -452,8 +447,8 @@ export default function StaffDashboardPage() {
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <p className="text-sm text-neutral-500">
-                            {isRedeemed ? 'Already used' : 'Valid — tap to view'}
+                          <p className="text-sm text-cyan-700">
+                            {isRedeemed ? 'ใช้แล้ว ✅' : 'ใช้ได้ — แตะเพื่อดู 👆'}
                           </p>
                           <p className="mt-1 text-xl font-semibold">
                             {coupon.code}
@@ -477,8 +472,8 @@ export default function StaffDashboardPage() {
                   <div className="rounded-3xl border border-cyan-100 bg-white/80 p-5">
                     <p className="text-sm text-cyan-900/70">
                       {selectedPhoneCoupon.status === 'redeemed'
-                        ? 'Already redeemed'
-                        : 'QR for staff to scan'}
+                        ? 'ใช้แล้ว ✅'
+                        : 'QR สำหรับพนักงานสแกน 📲'}
                     </p>
                     <div className="mt-4 flex justify-center rounded-2xl bg-white p-4 border border-cyan-100">
                       <QRCodeSVG value={selectedPhoneCoupon.code} size={220} />
@@ -491,7 +486,7 @@ export default function StaffDashboardPage() {
                         onClick={() => markRedeemed(selectedPhoneCoupon)}
                         className="mt-4 w-full rounded-2xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
                       >
-                        Redeem for customer
+                        ใช้คูปองให้ลูกค้า
                       </button>
                     )}
                   </div>
@@ -523,7 +518,7 @@ function ActionFrame({
           onClick={onBack}
           className="text-sm text-cyan-700 underline underline-offset-4"
         >
-          ← Back to dashboard
+          ← กลับหน้าหลัก
         </button>
         <h1 className="mt-4 text-3xl font-semibold">{title}</h1>
         <p className="mt-2 max-w-2xl text-sm text-cyan-900/60">{subtitle}</p>
@@ -544,9 +539,9 @@ function CouponResult({
   if (coupon.status === 'unclaimed') {
     return (
       <div className="rounded-3xl border border-cyan-100 bg-white/80 p-5 text-sm">
-        <p className="mb-1 font-medium text-cyan-700">Not yet claimed</p>
+        <p className="mb-1 font-medium text-cyan-700">ยังไม่ได้รับคูปอง</p>
         <p className="text-cyan-900/60">
-          This coupon hasn&apos;t been claimed by a customer yet.
+          คูปองนี้ยังไม่มีลูกค้ามารับสิทธิ์
         </p>
       </div>
     );
@@ -555,9 +550,9 @@ function CouponResult({
   if (coupon.status === 'redeemed') {
     return (
       <div className="rounded-3xl border border-cyan-100 bg-white/80 p-5 text-sm">
-        <p className="mb-1 font-medium text-cyan-700">Already redeemed</p>
+        <p className="mb-1 font-medium text-cyan-700">ใช้แล้ว ✅</p>
         <p className="text-cyan-900/60">
-          Used on {new Date(coupon.redeemed_at!).toLocaleString()}.
+          ใช้เมื่อ {new Date(coupon.redeemed_at!).toLocaleString()}
         </p>
       </div>
     );
@@ -565,15 +560,15 @@ function CouponResult({
 
   return (
     <div className="rounded-3xl border border-cyan-100 bg-white/80 p-5 text-sm">
-      <p className="mb-1 font-medium text-cyan-700">Valid — ready to redeem</p>
+      <p className="mb-1 font-medium text-cyan-700">ใช้ได้ — พร้อมใช้ ✅</p>
       <p className="mb-3 text-cyan-900/60">
-        Claimed by phone: {coupon.claimed_by_phone}
+        ผูกกับเบอร์: {coupon.claimed_by_phone}
       </p>
       <button
         onClick={() => onRedeem(coupon)}
         className="w-full rounded-2xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
       >
-        Redeem for customer
+        ใช้คูปองให้ลูกค้า
       </button>
     </div>
   );

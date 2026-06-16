@@ -49,7 +49,7 @@ export default function ClaimPage() {
     if (cleanPhone.length < 9) {
       setView({
         kind: 'claim_error',
-        message: 'Please enter a valid phone number.',
+        message: 'กรุณากรอกเบอร์โทรให้ถูกต้อง 📱',
       });
       return;
     }
@@ -57,9 +57,6 @@ export default function ClaimPage() {
     setView({ kind: 'claiming' });
     setConfirmingClaim(false);
 
-    // Atomic claim: only succeeds if still unclaimed.
-    // This prevents two people from claiming the same code at once,
-    // and locks the coupon to this phone number permanently.
     const { data, error } = await supabase
       .from('coupons')
       .update({
@@ -73,7 +70,6 @@ export default function ClaimPage() {
       .single();
 
     if (error || !data) {
-      // Someone else may have already claimed it in the meantime
       setView(await fetchCouponView(code));
       return;
     }
@@ -82,27 +78,27 @@ export default function ClaimPage() {
   }
 
   return (
-    <main className="min-h-screen text-cyan-950 flex flex-col items-center justify-center p-6">
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 text-cyan-950">
       <div className="w-full max-w-sm">
         <div className="mb-4 flex justify-center">
           <BrandLogo />
         </div>
         <h1 className="text-xl font-semibold text-center mb-1">
-          WeDrink U-Thong ☕
+          WeDrink U-Thong ☕✨
         </h1>
         <p className="text-center text-cyan-600 text-sm mb-8">
-          Buy One Get One Free — Coffee Promo
+          ซื้อ 1 แถม 1 — โปรกาแฟ ☕💙
         </p>
 
         {view.kind === 'loading' && (
-          <p className="text-center text-neutral-400">Loading…</p>
+          <p className="text-center text-cyan-900/60">กำลังโหลด…</p>
         )}
 
         {view.kind === 'not_found' && (
           <div className="bg-white/80 rounded-2xl p-6 text-center border border-cyan-100">
-            <p className="font-medium text-cyan-700">Coupon not found</p>
+            <p className="font-medium text-cyan-700">ไม่พบคูปอง 😢</p>
             <p className="text-cyan-900/60 text-sm mt-2">
-              This link doesn&apos;t match a valid coupon.
+              ลิงก์นี้ไม่ตรงกับคูปองที่ใช้งานได้
             </p>
           </div>
         )}
@@ -110,8 +106,7 @@ export default function ClaimPage() {
         {view.kind === 'ready_to_claim' && (
           <div className="bg-white/80 rounded-2xl p-6 border border-cyan-100 shadow-sm">
             <p className="text-sm text-cyan-900/70 mb-4">
-              Enter your phone number to claim your free drink coupon. This
-              coupon can only be used by you.
+              ใส่เบอร์โทรเพื่อรับคูปองเครื่องดื่มฟรี คูปองนี้ใช้ได้เฉพาะคุณ
             </p>
             <input
               type="tel"
@@ -124,29 +119,28 @@ export default function ClaimPage() {
               onClick={() => setConfirmingClaim(true)}
               className="w-full rounded-xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
             >
-              Claim My Coupon
+              รับคูปองเลย 🎟️
             </button>
             {confirmingClaim && (
               <div className="mt-3 rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-left">
                 <p className="text-cyan-700 text-sm font-medium mb-2">
-                  Final step
+                  ขั้นตอนสุดท้าย ⚠️
                 </p>
                 <p className="text-cyan-900/70 text-sm">
-                  If you claim this coupon, it will be linked to your phone
-                  number and cannot be transferred to someone else.
+                  ถ้ากดยืนยัน คูปองจะผูกกับเบอร์โทรนี้ และโอนไม่ได้อีก
                 </p>
                 <div className="mt-3 flex gap-2">
                   <button
                     onClick={() => setConfirmingClaim(false)}
                     className="flex-1 rounded-xl border border-cyan-200 bg-white py-2.5 text-sm text-cyan-900/70"
                   >
-                    Cancel
+                    ยกเลิก
                   </button>
                   <button
                     onClick={handleClaim}
                     className="flex-1 rounded-xl bg-cyan-500 py-2.5 text-sm font-semibold text-white"
                   >
-                    Yes, claim it
+                    ยืนยันรับคูปอง ✅
                   </button>
                 </div>
               </div>
@@ -155,7 +149,7 @@ export default function ClaimPage() {
         )}
 
         {view.kind === 'claiming' && (
-          <p className="text-center text-neutral-400">Claiming…</p>
+          <p className="text-center text-cyan-900/60">กำลังรับคูปอง…</p>
         )}
 
         {view.kind === 'claim_error' && (
@@ -172,7 +166,7 @@ export default function ClaimPage() {
               onClick={handleClaim}
               className="w-full rounded-xl bg-cyan-500 py-3 font-semibold text-white"
             >
-              Try Again
+              ลองอีกครั้ง
             </button>
           </div>
         )}
@@ -180,11 +174,10 @@ export default function ClaimPage() {
         {view.kind === 'claimed' && (
           <div className="bg-white/80 rounded-2xl p-6 text-center border border-cyan-100 shadow-sm">
             <p className="text-cyan-700 font-semibold mb-2">
-              ✓ Coupon Claimed!
+              ✓ รับคูปองสำเร็จ! 🎉
             </p>
             <p className="text-cyan-900/70 text-sm mb-4">
-              Show this QR code to staff when you want to redeem your free
-              drink.
+              แสดง QR นี้ให้พนักงานตอนต้องการใช้สิทธิ์
             </p>
             <div className="bg-white rounded-2xl p-5 flex min-h-[260px] items-center justify-center border border-cyan-100">
               <QRCodeCanvas
@@ -195,20 +188,20 @@ export default function ClaimPage() {
             </div>
             <div className="mt-4 rounded-2xl bg-cyan-50 p-4 text-left">
               <p className="text-xs uppercase tracking-wide text-cyan-700 mb-1">
-                Coupon code
+                รหัสคูปอง
               </p>
               <p className="font-mono text-lg text-cyan-950">
                 {view.coupon.code}
               </p>
               <p className="text-cyan-900/60 text-xs mt-2">
-                Linked to {view.coupon.claimed_by_phone} — non-transferable
+                ผูกกับเบอร์ {view.coupon.claimed_by_phone} — โอนไม่ได้
               </p>
             </div>
             <Link
               href="/lookup"
               className="mt-3 inline-block text-xs text-cyan-700 underline underline-offset-4"
             >
-              Lost this page? Find your coupon
+              ทำหน้านี้หาย? ค้นหาคูปองได้ที่นี่ 🔎
             </Link>
           </div>
         )}
@@ -216,11 +209,10 @@ export default function ClaimPage() {
         {view.kind === 'redeemed' && (
           <div className="bg-white/80 rounded-2xl p-6 text-center border border-cyan-100">
             <p className="font-medium text-cyan-900/80">
-              This coupon has already been used
+              คูปองนี้ถูกใช้ไปแล้ว ✅
             </p>
             <p className="text-cyan-900/60 text-sm mt-2">
-              Redeemed on{' '}
-              {new Date(view.coupon.redeemed_at!).toLocaleDateString()}
+              ใช้เมื่อ {new Date(view.coupon.redeemed_at!).toLocaleDateString()}
             </p>
           </div>
         )}

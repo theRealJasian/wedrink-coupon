@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import "./globals.css";
-import BrandLogo from "@/components/BrandLogo";
+import type { Metadata } from 'next';
+import './globals.css';
+import BrandLogo from '@/components/BrandLogo';
 
 export const metadata: Metadata = {
-  title: "WeDrink U-Thong — Coffee BOGO Coupons",
-  description: "Buy one coffee, get one free — claim your coupon",
+  title: 'WeDrink U-Thong — คูปองกาแฟ ☕',
+  description: 'ซื้อกาแฟ 1 แถม 1 — รับคูปองได้เลย ☕✨',
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full antialiased">
+    <html lang="th" className="h-full antialiased">
       <body className="min-h-full flex flex-col">
         <div className="border-b border-cyan-200/70 bg-white/70 backdrop-blur">
           <div className="mx-auto flex max-w-6xl items-center justify-center px-6 py-3">
