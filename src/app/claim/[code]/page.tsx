@@ -301,7 +301,7 @@ export default function ClaimPage() {
               ใช้คูปองเรียบร้อยแล้ว
             </p>
             <p className="mt-3 text-cyan-900/70 text-sm">
-              Enjoy ☕ ขอให้มีความสุขกับกาแฟแก้วฟรีของคุณ
+              ขอบคุณที่มาใช้สิทธิ์นะ ☕ ขอให้ดื่มกาแฟแก้วฟรีให้อร่อย
             </p>
             <div className="mt-4 rounded-2xl bg-cyan-50 p-4 text-left">
               <p className="text-xs uppercase tracking-wide text-cyan-700 mb-1">
@@ -314,12 +314,9 @@ export default function ClaimPage() {
                 ใช้เมื่อ {new Date(view.coupon.redeemed_at!).toLocaleString()}
               </p>
             </div>
-            <Link
-              href="/"
-              className="mt-4 inline-flex w-full items-center justify-center rounded-2xl bg-cyan-500 px-5 py-3 font-semibold text-white"
-            >
-              กลับหน้าแรก
-            </Link>
+            <div className="mt-4 rounded-2xl border border-cyan-100 bg-white p-4 text-sm text-cyan-900/70">
+              หน้าเสร็จสมบูรณ์แล้ว ไม่ต้องทำอะไรต่อ แค่แสดงหน้านี้ให้พนักงานดูได้เลย
+            </div>
           </div>
         )}
       </div>
