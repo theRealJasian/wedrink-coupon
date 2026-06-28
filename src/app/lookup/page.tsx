@@ -1,10 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { supabase, type Coupon } from '@/lib/supabase';
 import { formatPhoneNumber, normalizePhoneNumber } from '@/lib/phone';
 import BrandLogo from '@/components/BrandLogo';
+import {
+  COUPON_EXPIRY_LABEL,
+  isCouponExpired,
+} from '@/lib/couponDeadline';
 
 type LookupState =
   | { kind: 'idle' }
@@ -15,6 +19,17 @@ type LookupState =
 export default function LookupPage() {
   const [phone, setPhone] = useState('');
   const [state, setState] = useState<LookupState>({ kind: 'idle' });
+  const [now, setNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
+  const campaignExpired = isCouponExpired(new Date(now));
 
   async function handleLookup() {
     const cleanPhone = normalizePhoneNumber(phone);
@@ -61,6 +76,9 @@ export default function LookupPage() {
         <p className="text-center text-cyan-600 text-sm mb-8">
           ใส่เบอร์โทรที่เคยใช้รับคูปอง
         </p>
+        <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs leading-5 text-amber-950">
+          คูปองหมดอายุ {COUPON_EXPIRY_LABEL}
+        </div>
 
         <div className="bg-white/80 rounded-2xl p-5 sm:p-6 mb-4 border border-cyan-100">
           <label className="block text-xs uppercase tracking-wide text-cyan-700 mb-2">
@@ -104,6 +122,7 @@ export default function LookupPage() {
             ) : (
               state.coupons.map((coupon) => {
                 const isRedeemed = coupon.status === 'redeemed';
+                const couponExpired = campaignExpired && !isRedeemed;
 
                 return (
                   <Link
@@ -114,7 +133,11 @@ export default function LookupPage() {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <p className="text-sm text-cyan-700 mb-1">
-                          {isRedeemed ? 'ใช้แล้ว ✅' : 'ใช้ได้ — แตะเพื่อดู 👆'}
+                          {isRedeemed
+                            ? 'ใช้แล้ว ✅'
+                            : couponExpired
+                            ? 'หมดอายุแล้ว ⛔'
+                            : 'ใช้ได้ — แตะเพื่อดู 👆'}
                         </p>
                         <p className="text-lg font-semibold text-cyan-950">
                           {coupon.code}
@@ -124,10 +147,12 @@ export default function LookupPage() {
                         className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium ${
                           isRedeemed
                             ? 'bg-cyan-100 text-cyan-900'
+                            : couponExpired
+                            ? 'bg-rose-100 text-rose-700'
                             : 'bg-cyan-500/15 text-cyan-700'
                         }`}
                       >
-                        {coupon.status}
+                        {isRedeemed ? 'redeemed' : couponExpired ? 'expired' : coupon.status}
                       </span>
                     </div>
                     <p className="mt-3 text-xs text-cyan-900/60">
@@ -136,6 +161,13 @@ export default function LookupPage() {
                         ? new Date(coupon.claimed_at).toLocaleString()
                         : 'เมื่อสักครู่'}
                     </p>
+                    {!isRedeemed && (
+                      <p className="mt-2 text-xs text-cyan-900/60">
+                        {couponExpired
+                          ? 'คูปองนี้ไม่สามารถใช้ต่อได้แล้ว'
+                          : `ต้องใช้ก่อน ${COUPON_EXPIRY_LABEL}`}
+                      </p>
+                    )}
                   </Link>
                 );
               })

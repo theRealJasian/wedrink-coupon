@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import BrandLogo from '@/components/BrandLogo';
+import { COUPON_EXPIRY_LABEL } from '@/lib/couponDeadline';
 
 export const metadata: Metadata = {
   title: 'WeDrink U-Thong — คูปองกาแฟ ☕',
-  description: 'ซื้อกาแฟ 1 แถม 1 — รับคูปองได้เลย ☕✨',
+  description: `ซื้อกาแฟ 1 แถม 1 — คูปองหมดอายุ ${COUPON_EXPIRY_LABEL}`,
 };
 
 export default function RootLayout({

@@ -9,6 +9,10 @@ import { generateCouponCode } from '@/lib/codeGenerator';
 import { formatPhoneNumber, normalizePhoneNumber } from '@/lib/phone';
 import { supabase, type Coupon } from '@/lib/supabase';
 import BrandLogo from '@/components/BrandLogo';
+import {
+  COUPON_EXPIRY_LABEL,
+  isCouponExpired,
+} from '@/lib/couponDeadline';
 import couponPreview from '../../../wedrinkcoffeecoupon.png';
 
 type Screen = 'home' | 'generate' | 'redeem' | 'lookup';
@@ -56,10 +60,21 @@ export default function StaffDashboardPage() {
   );
   const [scanning, setScanning] = useState(false);
   const [scannerLoading, setScannerLoading] = useState(false);
+  const [now, setNow] = useState(() => Date.now());
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const scannerStartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null
   );
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setNow(Date.now());
+    }, 1000);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
+  const campaignExpired = isCouponExpired(new Date(now));
 
   async function loadDashboardCounts(cancelled = false) {
     const [
@@ -123,6 +138,11 @@ export default function StaffDashboardPage() {
   }
 
   async function generateCoupon() {
+    if (campaignExpired) {
+      setGenerationError('คูปองชุดนี้หมดอายุแล้ว');
+      return;
+    }
+
     setGenerationLoading(true);
     setBusyMessage('กำลังสร้างคูปอง…');
     setGenerationError(null);
@@ -226,6 +246,12 @@ export default function StaffDashboardPage() {
   }
 
   async function markRedeemed(coupon: Coupon) {
+    if (campaignExpired) {
+      setBusyMessage('คูปองหมดอายุแล้ว');
+      window.setTimeout(() => setBusyMessage(null), 1500);
+      return;
+    }
+
     setBusyMessage('กำลังใช้คูปอง…');
     const { data, error } = await supabase
       .from('coupons')
@@ -320,6 +346,9 @@ export default function StaffDashboardPage() {
               <p className="mt-2 max-w-2xl text-sm text-cyan-900/60">
                 เลือกสิ่งที่ต้องการทำ สร้างคูปอง ใช้คูปอง หรือค้นหาตามเบอร์โทร
               </p>
+              <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+                คูปองทั้งหมดหมดอายุ {COUPON_EXPIRY_LABEL}
+              </div>
               <div className="mt-4 inline-flex items-center gap-3 rounded-full border border-cyan-100 bg-white/80 px-4 py-2 text-sm font-medium text-cyan-900 shadow-sm">
                 <span className="rounded-full bg-cyan-500 px-2 py-1 text-xs font-semibold text-white">
                   เหลือ
@@ -464,11 +493,13 @@ export default function StaffDashboardPage() {
 
             <button
               onClick={generateCoupon}
-              disabled={generationLoading || remaining === 0}
+              disabled={generationLoading || remaining === 0 || campaignExpired}
               className="w-full rounded-2xl bg-cyan-500 py-4 text-lg font-semibold text-white disabled:bg-cyan-200 disabled:text-cyan-900/50"
             >
               {generationLoading
                 ? 'กำลังสร้าง…'
+                : campaignExpired
+                ? 'คูปองหมดอายุแล้ว'
                 : remaining === 0
                 ? 'คูปองหมดแล้ว'
                 : 'สร้างคูปอง'}
@@ -573,8 +604,9 @@ export default function StaffDashboardPage() {
             )}
 
             {couponState.kind === 'found' && (
-              <CouponResult
+          <CouponResult
                 coupon={couponState.coupon}
+                campaignExpired={campaignExpired}
                 onRedeem={markRedeemed}
                 onHome={() => setScreen('home')}
               />
@@ -622,6 +654,7 @@ export default function StaffDashboardPage() {
                 {phoneState.coupons.map((coupon) => {
                   const isSelected = selectedPhoneCoupon?.id === coupon.id;
                   const isRedeemed = coupon.status === 'redeemed';
+                  const isExpired = campaignExpired && !isRedeemed;
 
                   return (
                     <button
@@ -636,7 +669,11 @@ export default function StaffDashboardPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="text-sm text-cyan-700">
-                            {isRedeemed ? 'ใช้แล้ว ✅' : 'ใช้ได้ — แตะเพื่อดู 👆'}
+                            {isRedeemed
+                              ? 'ใช้แล้ว ✅'
+                              : isExpired
+                              ? 'หมดอายุแล้ว ⛔'
+                              : 'ใช้ได้ — แตะเพื่อดู 👆'}
                           </p>
                           <p className="mt-1 text-xl font-semibold">
                             {coupon.code}
@@ -646,10 +683,12 @@ export default function StaffDashboardPage() {
                           className={`rounded-full px-3 py-1 text-xs font-medium ${
                             isRedeemed
                               ? 'bg-cyan-100 text-cyan-900'
+                              : isExpired
+                              ? 'bg-rose-100 text-rose-700'
                               : 'bg-cyan-500/15 text-cyan-700'
                           }`}
                         >
-                          {coupon.status}
+                          {isRedeemed ? 'redeemed' : isExpired ? 'expired' : coupon.status}
                         </span>
                       </div>
                     </button>
@@ -661,6 +700,8 @@ export default function StaffDashboardPage() {
                     <p className="text-sm text-cyan-900/70">
                       {selectedPhoneCoupon.status === 'redeemed'
                         ? 'ใช้แล้ว ✅'
+                        : campaignExpired
+                        ? 'คูปองนี้หมดอายุแล้ว ⛔'
                         : 'QR สำหรับพนักงานสแกน 📲'}
                     </p>
                     <div className="mt-4 flex justify-center rounded-2xl bg-white p-4 border border-cyan-100">
@@ -670,7 +711,7 @@ export default function StaffDashboardPage() {
                       {selectedPhoneCoupon.code}
                     </p>
                     <div className="mt-4 grid gap-2 sm:grid-cols-2">
-                      {selectedPhoneCoupon.status === 'claimed' && (
+                      {selectedPhoneCoupon.status === 'claimed' && !campaignExpired && (
                         <button
                           onClick={() => markRedeemed(selectedPhoneCoupon)}
                           className="w-full rounded-2xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
@@ -739,19 +780,25 @@ function ActionFrame({
 
 function CouponResult({
   coupon,
+  campaignExpired,
   onRedeem,
   onHome,
 }: {
   coupon: Coupon;
+  campaignExpired: boolean;
   onRedeem: (c: Coupon) => void;
   onHome: () => void;
 }) {
   if (coupon.status === 'unclaimed') {
     return (
       <div className="rounded-3xl border border-cyan-100 bg-white/80 p-5 text-sm">
-        <p className="mb-1 font-medium text-cyan-700">ยังไม่ได้รับคูปอง</p>
+        <p className="mb-1 font-medium text-cyan-700">
+          {campaignExpired ? 'หมดอายุแล้ว ⛔' : 'ยังไม่ได้รับคูปอง'}
+        </p>
         <p className="text-cyan-900/60">
-          คูปองนี้ยังไม่มีลูกค้ามารับสิทธิ์
+          {campaignExpired
+            ? `คูปองชุดนี้ใช้ได้ถึง ${COUPON_EXPIRY_LABEL}`
+            : 'คูปองนี้ยังไม่มีลูกค้ามารับสิทธิ์'}
         </p>
       </div>
     );
@@ -763,6 +810,17 @@ function CouponResult({
         <p className="mb-1 font-medium text-cyan-700">ใช้แล้ว ✅</p>
         <p className="text-cyan-900/60">
           ใช้เมื่อ {new Date(coupon.redeemed_at!).toLocaleString()}
+        </p>
+      </div>
+    );
+  }
+
+  if (campaignExpired) {
+    return (
+      <div className="rounded-3xl border border-rose-200 bg-rose-50 p-5 text-sm">
+        <p className="mb-1 font-medium text-rose-700">คูปองหมดอายุแล้ว ⛔</p>
+        <p className="text-rose-950/70">
+          คูปองนี้ใช้ได้ถึง {COUPON_EXPIRY_LABEL}
         </p>
       </div>
     );
