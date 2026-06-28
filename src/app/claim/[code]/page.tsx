@@ -30,7 +30,6 @@ export default function ClaimPage() {
 
   const [view, setView] = useState<ViewState>({ kind: 'loading' });
   const [phone, setPhone] = useState('');
-  const [confirmingClaim, setConfirmingClaim] = useState(false);
   const [celebrate, setCelebrate] = useState(false);
   const [now, setNow] = useState(() => Date.now());
 
@@ -92,7 +91,6 @@ export default function ClaimPage() {
         kind: 'claim_error',
         message: 'คูปองหมดอายุแล้ว ⛔',
       });
-      setConfirmingClaim(false);
       return;
     }
 
@@ -107,7 +105,6 @@ export default function ClaimPage() {
     }
 
     setView({ kind: 'claiming' });
-    setConfirmingClaim(false);
 
     const { data, error } = await supabase
       .from('coupons')
@@ -188,35 +185,14 @@ export default function ClaimPage() {
                 className="w-full rounded-xl border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm outline-none focus:border-cyan-500 mb-3"
               />
               <button
-                onClick={() => setConfirmingClaim(true)}
+                onClick={handleClaim}
                 className="w-full rounded-xl bg-cyan-500 py-3 font-semibold text-white hover:bg-cyan-400"
               >
                 รับคูปองเลย 🎟️
               </button>
-              {confirmingClaim && (
-                <div className="mt-3 rounded-xl border border-cyan-200 bg-cyan-50 p-4 text-left">
-                  <p className="text-cyan-700 text-sm font-medium mb-2">
-                    ขั้นตอนสุดท้าย ⚠️
-                  </p>
-                  <p className="text-cyan-900/70 text-sm">
-                    ถ้ากดยืนยัน คูปองจะผูกกับเบอร์โทรนี้ และโอนไม่ได้อีก
-                  </p>
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      onClick={() => setConfirmingClaim(false)}
-                      className="flex-1 rounded-xl border border-cyan-200 bg-white py-2.5 text-sm text-cyan-900/70"
-                    >
-                      ยกเลิก
-                    </button>
-                    <button
-                      onClick={handleClaim}
-                      className="flex-1 rounded-xl bg-cyan-500 py-2.5 text-sm font-semibold text-white"
-                    >
-                      ยืนยันรับคูปอง ✅
-                    </button>
-                  </div>
-                </div>
-              )}
+              <p className="mt-3 text-xs text-cyan-900/60">
+                เมื่อกดรับคูปอง ถือว่าคุณยอมรับเงื่อนไขและผูกคูปองกับเบอร์นี้แล้ว
+              </p>
             </div>
           )
         )}
